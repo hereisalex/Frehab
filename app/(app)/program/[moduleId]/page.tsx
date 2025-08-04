@@ -14,12 +14,14 @@ interface Module {
   description: string
   content?: {
     lessons: Array<{
-      type: 'reading' | 'video' | 'tool'
+      type: 'reading' | 'video' | 'tool' | 'audio'
       title: string
       summary: string
       external_url?: string
       video_id?: string
       pdf_url?: string
+      audio_url?: string
+      duration?: string
       button_text: string
     }>
     tools: Array<{
@@ -94,6 +96,48 @@ export default function ModulePage() {
                       title: 'The Psychology of Motivation',
                       summary: 'Deep dive into the psychological principles that drive behavior change and sustained motivation.',
                       wiki_url: '/wiki/psychology-of-motivation',
+                      button_text: 'Read Article'
+                    }
+                  ]
+                }
+              })
+            } else if (parseInt(moduleId) === 2) {
+              setModule({
+                id: 2,
+                module_number: 2,
+                title: 'Building Your Support System',
+                description: 'Recovery doesn\'t happen in isolation. This module focuses on building and strengthening your support network. Learn how to identify healthy relationships, communicate your needs effectively, and develop the skills to maintain boundaries. You\'ll also explore how to find and connect with recovery communities that align with your values.',
+                content: {
+                  lessons: [
+                    {
+                      type: 'video',
+                      title: 'The Science of Addiction',
+                      summary: 'Understanding the neurobiology of addiction, including dopamine pathways and neuroplasticity. Learn how substances affect the brain and why recovery is possible.',
+                      video_id: 'V1bFr2SWP1I',
+                      button_text: 'Watch Video'
+                    },
+                    {
+                      type: 'reading',
+                      title: 'Understanding Triggers',
+                      summary: 'Learn to identify and understand your personal triggers for substance use. This evidence-based guide helps you recognize patterns and develop coping strategies.',
+                      external_url: 'https://nida.nih.gov/publications/drugs-brains-behavior-science-addiction/treatment-recovery',
+                      button_text: 'Read Article'
+                    },
+                    {
+                      type: 'audio',
+                      title: 'Mindful Observation',
+                      summary: 'A 5-minute guided mindfulness exercise to help you develop awareness of your thoughts, feelings, and urges without judgment.',
+                      audio_url: '/audio/mindful-observation.mp3',
+                      duration: '5:00',
+                      button_text: 'Listen Now'
+                    }
+                  ],
+                  tools: [
+                    {
+                      type: 'wiki',
+                      title: 'Post-Acute Withdrawal Syndrome (PAWS)',
+                      summary: 'Understanding the long-term effects of substance withdrawal and how to manage symptoms that may persist for weeks or months after stopping use.',
+                      wiki_url: '/wiki/paws',
                       button_text: 'Read Article'
                     }
                   ]
@@ -281,6 +325,7 @@ export default function ModulePage() {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                           lesson.type === 'reading' ? 'bg-blue-100' :
                           lesson.type === 'video' ? 'bg-red-100' :
+                          lesson.type === 'audio' ? 'bg-purple-100' :
                           'bg-green-100'
                         }`}>
                           {lesson.type === 'reading' && (
@@ -291,6 +336,11 @@ export default function ModulePage() {
                           {lesson.type === 'video' && (
                             <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          )}
+                          {lesson.type === 'audio' && (
+                            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                             </svg>
                           )}
                           {lesson.type === 'tool' && (
@@ -306,10 +356,12 @@ export default function ModulePage() {
                             <span className={`text-xs px-2 py-1 rounded-full ${
                               lesson.type === 'reading' ? 'bg-blue-100 text-blue-700' :
                               lesson.type === 'video' ? 'bg-red-100 text-red-700' :
+                              lesson.type === 'audio' ? 'bg-purple-100 text-purple-700' :
                               'bg-green-100 text-green-700'
                             }`}>
                               {lesson.type === 'reading' ? 'Reading' :
-                               lesson.type === 'video' ? 'Video' : 'Tool'}
+                               lesson.type === 'video' ? 'Video' :
+                               lesson.type === 'audio' ? 'Audio' : 'Tool'}
                             </span>
                           </div>
                           <p className="text-neutral-600 text-sm mb-2">{lesson.summary}</p>
@@ -330,6 +382,16 @@ export default function ModulePage() {
                                 size="sm" 
                                 className="text-red-600 hover:text-red-700"
                                 onClick={() => window.open(`https://www.youtube.com/watch?v=${lesson.video_id}`, '_blank')}
+                              >
+                                {lesson.button_text} →
+                              </Button>
+                            )}
+                            {lesson.type === 'audio' && lesson.audio_url && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-purple-600 hover:text-purple-700"
+                                onClick={() => window.open(lesson.audio_url, '_blank')}
                               >
                                 {lesson.button_text} →
                               </Button>
