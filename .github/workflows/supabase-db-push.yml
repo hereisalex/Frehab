@@ -32,6 +32,8 @@ jobs:
         run: supabase link --project-ref avlfffrocdabopmssohw
 
       - name: Push migrations to remote
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: supabase db push
 
 
