@@ -88,4 +88,5 @@ SET content = '{
     }
   ]
 }'::jsonb
-WHERE module_number = 3;
+WHERE module_number = 3;-- Trigger DB update
+-- Trigger DB update
