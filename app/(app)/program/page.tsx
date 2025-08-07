@@ -25,6 +25,12 @@ const mockModules: Module[] = [
     module_number: 2,
     title: 'Building Your Support System',
     description: 'Recovery doesn\'t happen in isolation. This module focuses on building and strengthening your support network. Learn how to identify healthy relationships, communicate your needs effectively, and develop the skills to maintain boundaries. You\'ll also explore how to find and connect with recovery communities that align with your values.'
+  },
+  {
+    id: 3,
+    module_number: 3,
+    title: 'From Values to Habits: Build Your Recovery System',
+    description: 'Translate your core values into small, repeatable habits. Design systems that make the right choice the easy choice, aligning daily actions with the life you want.'
   }
 ]
 

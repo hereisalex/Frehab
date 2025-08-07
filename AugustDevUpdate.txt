@@ -1,0 +1,109 @@
+Frehab: Project Summary & Status
+As of: Thursday, August 7, 2025
+Current Domain: Frehab.org
+
+1. Project Vision & Guiding Philosophy
+Mission: To create a free, anonymous, and inclusive online platform that provides an evidence-based, community-powered path to recovery from any addiction.
+
+Core Philosophies:
+
+"Odin Project" Model: We provide a structured, linear curriculum that guides users through a comprehensive program, rather than just offering a collection of tools.
+
+"Core + Multi-Specialization" Architecture: The curriculum consists of a universal Core program (the "operating system" of recovery) enhanced with specialized content blocks tailored to the multiple, specific addictions a user selects (e.g., Alcohol, Gambling, Stimulants).
+
+Inclusivity & Harm Reduction: We explicitly support all recovery paths, including abstinence, moderation, and harm reduction. This is embodied by our flexible "Personal Goal Tracker."
+
+Dual-Track Curriculum: Our program focuses on two parallel goals:
+
+The Foundation (How to Stop): Building the skills to manage cravings and triggers.
+
+The Framework (How to Live): Proactively building a meaningful life that makes sobriety a positive choice.
+
+Humor & Relatability: We will tastefully incorporate humor and personality to make the platform feel human and supportive, not clinical.
+
+2. Project Outline & Technical Architecture
+Framework: Next.js 14+ (App Router)
+
+Language: TypeScript
+
+Styling: Tailwind CSS ("Calm Harmony" theme)
+
+Backend & Database: Supabase (PostgreSQL, Auth)
+
+Deployment: Vercel
+
+Open Source License: AGPL 3.0 (Chosen to ensure Frehab and all its derivatives remain open-source).
+
+Key Platform Components:
+
+User Authentication: A complete system for email/password and social OAuth logins.
+
+User Dashboard: A personalized hub for returning users.
+
+Personal Goal Tracker: A configurable dashboard widget for tracking abstinence, moderation, or custom daily goals.
+
+Core Program: An 8-module curriculum with dynamic, personalized content.
+
+Private Journal: A secure space for users to complete Action-Based Projects.
+
+Community Hub: A planned forum for peer-to-peer support (to be integrated with Discourse).
+
+Frehab Wiki: A planned community-built knowledge base.
+
+Achievement System: A planned gamification system to reward user progress.
+
+3. Current Status & Progress So Far
+We have successfully built the foundational "vertical slice" of the application.
+
+✅ Initial Scaffolding: The complete Next.js project structure is built and configured.
+
+✅ Branding: The domain frehab.org has been secured and the project has been renamed accordingly.
+
+✅ User Authentication: A user can successfully sign up, log in (via email or social providers), and log out. The application correctly maintains session state.
+
+✅ Dashboard UI: The main dashboard layout is built, including a sidebar and widgets.
+
+✅ Personal Goal Tracker: The initial "Sobriety Tracker" has been successfully refactored into the more inclusive "Personal Goal Tracker," allowing users to choose their own goal.
+
+✅ Core Program Framework: The database schema and UI pages for the program are built. This includes a landing page that lists all modules and a dynamic page template that can render content for any given module.
+
+✅ Module 1 & 2 Content: The "Lessons & Tools" sections for Module 1 are fully implemented with dynamic content. The same implementation is in progress for Module 2.
+
+✅ Private Journal (Partial): The backend and UI for the Module 1 Action-Based Project have been implemented, allowing users to save their work to the database.
+
+✅ Design for Key Features: We have completed detailed design documents for the Achievement System and the Expandable Callout component (including animation and haptics).
+
+4. Immediate & Future Implementation Plan
+This is our roadmap moving forward.
+
+Immediate Next Steps:
+
+Implement Expandable Callout Component: Build the reusable component with animation and sensory feedback that will be used to display the multi-specialization content within modules.
+
+Complete Module 2:
+
+Build the UI for the "Trigger & Craving Map" Action-Based Project.
+
+Implement the backend logic to save this project to the user's journal.
+
+Implement Achievement System (Backend):
+
+Build the database tables (achievements, user_achievements).
+
+Create the server-side logic to grant achievements when users complete projects (starting with the Module 1 & 2 projects).
+
+Future Roadmap (The Path to MVP Launch):
+
+Build Out Modules 3-8: Sequentially complete each module's lessons, tools, and Action-Based Project.
+
+Build Full Journal UI: Create the main journal page that allows users to browse, read, and edit all their past entries.
+
+Build Achievement UI: Create the "Achievements" page to display earned and unearned trophies.
+
+Integrate Community Hub: Set up and link to our managed Discourse forum.
+
+Build Out Wiki: Create the initial framework and seed it with the articles identified in the curriculum plan.
+
+Incorporate Humor: Implement the "Sarcastic" daily affirmation setting and add personality to microcopy.
+
+Finalize Legal: Add the LICENSE file and copyright/trademark notices to the site.

@@ -44,3 +44,48 @@ SET content = '{
   ]
 }'::jsonb
 WHERE module_number = 1; 
+
+-- Seed Module 3 metadata and content
+INSERT INTO modules (module_number, title, description)
+VALUES (
+  3,
+  'From Values to Habits: Build Your Recovery System',
+  'Translate your core values into small, repeatable habits. Design systems that make the right choice the easy choice, aligning daily actions with the life you want.'
+) ON CONFLICT (module_number) DO NOTHING;
+
+UPDATE modules
+SET content = '{
+  "lessons": [
+    {
+      "type": "reading",
+      "title": "Atomic Habits: Systems Over Goals",
+      "summary": "Why focusing on systems and identity-based habits leads to durable behavior change.",
+      "external_url": "https://jamesclear.com/atomic-habits",
+      "button_text": "Read Article"
+    },
+    {
+      "type": "video",
+      "title": "Tiny Habits That Stick",
+      "summary": "A short overview of designing habits so small they are impossible to skip.",
+      "video_id": "AdKUJxjn-R8",
+      "button_text": "Watch Video"
+    },
+    {
+      "type": "reading",
+      "title": "Implementation Intentions",
+      "summary": "Use if-then plans to make actions automatic in the moments that matter.",
+      "external_url": "https://en.wikipedia.org/wiki/Implementation_intention",
+      "button_text": "Read Overview"
+    }
+  ],
+  "tools": [
+    {
+      "type": "wiki",
+      "title": "Habit Stacking",
+      "summary": "Attach new behaviors to existing routines to reduce friction.",
+      "wiki_url": "/wiki/habit-stacking",
+      "button_text": "Open Guide"
+    }
+  ]
+}'::jsonb
+WHERE module_number = 3;

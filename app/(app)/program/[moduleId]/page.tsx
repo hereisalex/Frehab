@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import PersonalBalanceSheet from '@/components/PersonalBalanceSheet'
+import ValuesToHabitsPlanner from '@/components/ValuesToHabitsPlanner'
 
 interface Module {
   id: number
@@ -227,6 +228,7 @@ export default function ModulePage() {
 
   // Check if this is Module 1 for the Personal Balance Sheet component
   const isModule1 = module.module_number === 1
+  const isModule3 = module.module_number === 3
 
   return (
     <div className="min-h-screen bg-background">
@@ -418,6 +420,8 @@ export default function ModulePage() {
             {/* Action-Based Project */}
             {isModule1 ? (
               <PersonalBalanceSheet />
+            ) : isModule3 ? (
+              <ValuesToHabitsPlanner />
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">
@@ -476,7 +480,7 @@ export default function ModulePage() {
             )}
 
             {/* Placeholder for other modules */}
-            {!isModule1 && (
+            {!isModule1 && !isModule3 && (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-neutral-200 rounded-full mx-auto mb-4 flex items-center justify-center">
