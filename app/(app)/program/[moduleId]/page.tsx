@@ -45,6 +45,61 @@ export default function ModulePage() {
   const [module, setModule] = useState<Module | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
+  const [lessonsCompleted, setLessonsCompleted] = useState<string[]>([])
+  const [toolsUsed, setToolsUsed] = useState<string[]>([])
+  const [projectCompleted, setProjectCompleted] = useState<boolean>(false)
+
+  const storageKey = `module_progress_${moduleId}`
+
+  const loadProgressFromStorage = () => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { lessonsCompleted?: string[]; toolsUsed?: string[]; projectCompleted?: boolean }
+      setLessonsCompleted(parsed.lessonsCompleted || [])
+      setToolsUsed(parsed.toolsUsed || [])
+      setProjectCompleted(!!parsed.projectCompleted)
+    } catch {}
+  }
+
+  const saveProgressToStorage = (next: { lessonsCompleted?: string[]; toolsUsed?: string[]; projectCompleted?: boolean }) => {
+    try {
+      const current = {
+        lessonsCompleted,
+        toolsUsed,
+        projectCompleted,
+        ...next,
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, JSON.stringify(current))
+      }
+    } catch {}
+  }
+
+  const handleLessonClick = (lessonId: string, url: string) => {
+    if (!lessonsCompleted.includes(lessonId)) {
+      const next = [...lessonsCompleted, lessonId]
+      setLessonsCompleted(next)
+      saveProgressToStorage({ lessonsCompleted: next })
+    }
+    window.open(url, '_blank')
+  }
+
+  const handleToolClick = (toolId: string, url: string) => {
+    if (!toolsUsed.includes(toolId)) {
+      const next = [...toolsUsed, toolId]
+      setToolsUsed(next)
+      saveProgressToStorage({ toolsUsed: next })
+    }
+    window.open(url, '_blank')
+  }
+
+  const handleProjectSaved = () => {
+    if (!projectCompleted) {
+      setProjectCompleted(true)
+      saveProgressToStorage({ projectCompleted: true })
+    }
+  }
 
   useEffect(() => {
     const fetchModule = async () => {
@@ -206,6 +261,7 @@ export default function ModulePage() {
 
     if (moduleId) {
       fetchModule()
+      loadProgressFromStorage()
     }
   }, [moduleId])
 
@@ -362,7 +418,10 @@ export default function ModulePage() {
                 </div>
                 
                 <div className="space-y-4">
-                  {module.content.lessons.map((lesson, index) => (
+                  {module.content.lessons.map((lesson, index) => {
+                    const lessonId = `${module.module_number}:${lesson.title}`
+                    const isDone = lessonsCompleted.includes(lessonId)
+                    return (
                     <div key={index} className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
                       <div className="flex items-start space-x-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -396,6 +455,9 @@ export default function ModulePage() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="font-medium text-text">{lesson.title}</h3>
+                            {isDone && (
+                              <span className="inline-flex items-center text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Done</span>
+                            )}
                             <span className={`text-xs px-2 py-1 rounded-full ${
                               lesson.type === 'reading' ? 'bg-blue-100 text-blue-700' :
                               lesson.type === 'video' ? 'bg-red-100 text-red-700' :
@@ -414,7 +476,7 @@ export default function ModulePage() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-blue-600 hover:text-blue-700"
-                                onClick={() => window.open(lesson.external_url, '_blank')}
+                                onClick={() => handleLessonClick(lessonId, lesson.external_url!)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -424,7 +486,7 @@ export default function ModulePage() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-red-600 hover:text-red-700"
-                                onClick={() => window.open(`https://www.youtube.com/watch?v=${lesson.video_id}`, '_blank')}
+                                onClick={() => handleLessonClick(lessonId, `https://www.youtube.com/watch?v=${lesson.video_id}`)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -434,7 +496,7 @@ export default function ModulePage() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-purple-600 hover:text-purple-700"
-                                onClick={() => window.open(lesson.audio_url, '_blank')}
+                                onClick={() => handleLessonClick(lessonId, lesson.audio_url!)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -444,7 +506,7 @@ export default function ModulePage() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-green-600 hover:text-green-700"
-                                onClick={() => window.open(lesson.pdf_url, '_blank')}
+                                onClick={() => handleLessonClick(lessonId, lesson.pdf_url!)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -453,16 +515,16 @@ export default function ModulePage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             )}
 
             {/* Action-Based Project */}
             {isModule1 ? (
-              <PersonalBalanceSheet />
+              <PersonalBalanceSheet onSave={handleProjectSaved} />
             ) : isModule3 ? (
-              <ValuesToHabitsPlanner />
+              <ValuesToHabitsPlanner onSave={handleProjectSaved} />
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">
@@ -584,17 +646,19 @@ export default function ModulePage() {
                 </div>
                 
                 <div className="space-y-3">
-                  {module.content.tools.map((tool, index) => (
-                    <div key={index} className="bg-neutral-50 rounded-lg p-3 border border-neutral-200">
-                      <h4 className="font-medium text-text text-sm mb-1">{tool.title}</h4>
-                      <p className="text-xs text-neutral-600 mb-2">{tool.summary}</p>
-                      <Link href={tool.wiki_url}>
-                        <Button variant="secondary" size="sm" className="w-full">
-                          {tool.button_text}
+                  {module.content.tools.map((tool, index) => {
+                    const toolId = `${module.module_number}:${tool.title}`
+                    const used = toolsUsed.includes(toolId)
+                    return (
+                      <div key={index} className="bg-neutral-50 rounded-lg p-3 border border-neutral-200">
+                        <h4 className="font-medium text-text text-sm mb-1">{tool.title}</h4>
+                        <p className="text-xs text-neutral-600 mb-2">{tool.summary}</p>
+                        <Button variant="secondary" size="sm" className="w-full" onClick={() => handleToolClick(toolId, tool.wiki_url)}>
+                          {used ? 'Opened' : tool.button_text}
                         </Button>
-                      </Link>
-                    </div>
-                  ))}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -605,25 +669,34 @@ export default function ModulePage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-600">Lessons Completed</span>
-                  <span className="text-sm font-medium text-text">0/3</span>
+                  <span className="text-sm font-medium text-text">{lessonsCompleted.length}/{module.content?.lessons?.length || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-600">Tools Used</span>
-                  <span className="text-sm font-medium text-text">0/3</span>
+                  <span className="text-sm font-medium text-text">{toolsUsed.length}/{module.content?.tools?.length || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-600">Project Status</span>
-                  <span className="text-sm font-medium text-text">Not Started</span>
+                  <span className="text-sm font-medium text-text">{projectCompleted ? 'Completed' : 'Not Started'}</span>
                 </div>
               </div>
               
               <div className="mt-4 pt-4 border-t border-neutral-200">
                 <div className="text-center">
                   <p className="text-sm text-neutral-600 mb-2">Module Progress</p>
-                  <div className="w-full bg-neutral-200 rounded-full h-2">
-                    <div className="bg-primary-500 h-2 rounded-full" style={{ width: '0%' }}></div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1">0% Complete</p>
+                  {(() => {
+                    const total = (module.content?.lessons?.length || 0) + (module.content?.tools?.length || 0) + 1
+                    const done = lessonsCompleted.length + toolsUsed.length + (projectCompleted ? 1 : 0)
+                    const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : 0
+                    return (
+                      <>
+                        <div className="w-full bg-neutral-200 rounded-full h-2">
+                          <div className="bg-primary-500 h-2 rounded-full" style={{ width: `${pct}%` }}></div>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">{pct}% Complete</p>
+                      </>
+                    )
+                  })()}
                 </div>
               </div>
             </div>

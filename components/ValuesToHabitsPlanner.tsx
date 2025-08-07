@@ -18,7 +18,7 @@ interface HabitItem {
   frequency: 'daily' | 'weekly' | 'custom'
 }
 
-export default function ValuesToHabitsPlanner() {
+export default function ValuesToHabitsPlanner({ onSave }: { onSave?: () => void }) {
   const { user } = useAuth()
   const [values, setValues] = useState<ValueItem[]>([])
   const [habits, setHabits] = useState<HabitItem[]>([])
@@ -103,6 +103,7 @@ export default function ValuesToHabitsPlanner() {
       }
 
       setSaved(true)
+      onSave?.()
       setTimeout(() => setSaved(false), 3000)
     } catch (e) {
       console.error(e)
