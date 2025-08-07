@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts 
+
+# sensitive files
+secrets.txt
+OAUTH_CREDENTIALS.md
+.env
+.env.local
+.env.production
