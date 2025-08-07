@@ -31,13 +31,14 @@ jobs:
       - name: Link project
         run: supabase link --project-ref avlfffrocdabopmssohw
 
+      - name: Install expect
+        run: sudo apt-get update && sudo apt-get install -y expect
+
       - name: Push migrations to remote
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          # Try the password input approach
-          printf "%s\n" "$SUPABASE_DB_PASSWORD" | supabase db push || \
-          # Fallback: use expect to handle interactive prompt
+          # Use expect to handle the interactive password prompt
           expect -c "
             spawn supabase db push
             expect 'Enter your database password:'
