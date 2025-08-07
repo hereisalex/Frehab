@@ -35,6 +35,14 @@ jobs:
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          printf "%s\n" "$SUPABASE_DB_PASSWORD" | supabase db push
+          # Try the password input approach
+          printf "%s\n" "$SUPABASE_DB_PASSWORD" | supabase db push || \
+          # Fallback: use expect to handle interactive prompt
+          expect -c "
+            spawn supabase db push
+            expect 'Enter your database password:'
+            send '$SUPABASE_DB_PASSWORD\r'
+            expect eof
+          "
 
 
