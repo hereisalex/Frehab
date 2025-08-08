@@ -84,19 +84,24 @@ function Lights() {
   )
 }
 
-function useGameLoop(
-  running: boolean,
-  setRunning: (r: boolean) => void,
-  playerLane: React.MutableRefObject<Lane>,
-  entitiesRef: React.MutableRefObject<Entity[]>,
-  onCollide: (e: Entity) => void,
-  speedRef: React.MutableRefObject<number>,
-  elapsedMsRef: React.MutableRefObject<number>,
-) {
+function RunnerLoop({
+  runningRef,
+  playerLaneRef,
+  entitiesRef,
+  onCollide,
+  speedRef,
+  elapsedMsRef,
+}: {
+  runningRef: React.MutableRefObject<boolean>
+  playerLaneRef: React.MutableRefObject<Lane>
+  entitiesRef: React.MutableRefObject<Entity[]>
+  onCollide: (e: Entity) => void
+  speedRef: React.MutableRefObject<number>
+  elapsedMsRef: React.MutableRefObject<number>
+}) {
   const lastTimeRef = useRef<number>(0)
-
   useFrame((_, delta) => {
-    if (!running) return
+    if (!runningRef.current) return
 
     // Update elapsed time
     elapsedMsRef.current += delta * 1000
@@ -110,7 +115,7 @@ function useGameLoop(
     const thresholdZ = 2.0
     const remaining: Entity[] = []
     for (const e of entitiesRef.current) {
-      if (e.z >= thresholdZ - 0.6 && e.z <= thresholdZ + 0.6 && e.lane === playerLane.current) {
+      if (e.z >= thresholdZ - 0.6 && e.z <= thresholdZ + 0.6 && e.lane === playerLaneRef.current) {
         onCollide(e)
         continue
       }
@@ -127,6 +132,7 @@ function useGameLoop(
       entitiesRef.current.push({ id: crypto.randomUUID(), lane: randomLane(), z: -30, type })
     }
   })
+  return null
 }
 
 export default function RelapseRunner3D({ onComplete }: Props) {
@@ -209,7 +215,8 @@ export default function RelapseRunner3D({ onComplete }: Props) {
     return () => clearInterval(id)
   }, [])
 
-  useGameLoop(running, setRunning, playerLaneRef, entitiesRef, onCollide, speedRef, elapsedMsRef)
+  const runningRef = useRef<boolean>(running)
+  useEffect(() => { runningRef.current = running }, [running])
 
   const saveResult = useCallback(async () => {
     setSubmitting(true)
@@ -292,6 +299,15 @@ export default function RelapseRunner3D({ onComplete }: Props) {
           <Lights />
           <fog attach="fog" args={["#93c5fd", 8, 40]} />
           <Ground />
+
+          <RunnerLoop
+            runningRef={runningRef}
+            playerLaneRef={playerLaneRef}
+            entitiesRef={entitiesRef}
+            onCollide={onCollide}
+            speedRef={speedRef}
+            elapsedMsRef={elapsedMsRef}
+          />
 
           {/* Lanes guide */}
           <mesh position={[-2.2, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
