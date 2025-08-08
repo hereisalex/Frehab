@@ -59,6 +59,89 @@ function PhaseText({ text }: { text: string }) {
   )
 }
 
+type LoopProps = {
+  runningRef: React.MutableRefObject<boolean>
+  finishedRef: React.MutableRefObject<boolean>
+  startTimeRef: React.MutableRefObject<number>
+  lastFrameRef: React.MutableRefObject<number>
+  durationMs: number
+  cycleMs: number
+  setExpectedPhase: React.Dispatch<React.SetStateAction<Phase>>
+  setElapsedMs: React.Dispatch<React.SetStateAction<number>>
+  setMatchMs: React.Dispatch<React.SetStateAction<number>>
+  setCurrentStreakMs: React.Dispatch<React.SetStateAction<number>>
+  setBestStreakMs: React.Dispatch<React.SetStateAction<number>>
+  setScore: React.Dispatch<React.SetStateAction<number>>
+  setCyclesCompleted: React.Dispatch<React.SetStateAction<number>>
+  phaseFromT: (tMs: number) => Phase
+  userPhaseRef: React.MutableRefObject<Phase>
+  setFinished: React.Dispatch<React.SetStateAction<boolean>>
+  setRunning: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+function BreathFlowLoop({
+  runningRef,
+  finishedRef,
+  startTimeRef,
+  lastFrameRef,
+  durationMs,
+  cycleMs,
+  setExpectedPhase,
+  setElapsedMs,
+  setMatchMs,
+  setCurrentStreakMs,
+  setBestStreakMs,
+  setScore,
+  setCyclesCompleted,
+  phaseFromT,
+  userPhaseRef,
+  setFinished,
+  setRunning,
+}: LoopProps) {
+  useFrame(() => {
+    if (!runningRef.current || finishedRef.current) return
+    const now = performance.now()
+    const delta = now - lastFrameRef.current
+    lastFrameRef.current = now
+
+    const tSinceStart = now - startTimeRef.current
+    const exp = phaseFromT(tSinceStart)
+    setExpectedPhase(exp)
+
+    const userPhase = userPhaseRef.current
+    const isMatch =
+      (exp === 'inhale' && userPhase === 'inhale') ||
+      (exp === 'exhale' && userPhase === 'exhale') ||
+      exp === 'hold1' ||
+      exp === 'hold2'
+
+    setElapsedMs((v) => v + delta)
+    if (isMatch) {
+      setMatchMs((v) => v + delta)
+      setCurrentStreakMs((s) => {
+        const next = s + delta
+        setBestStreakMs((prev) => (next > prev ? next : prev))
+        return next
+      })
+      setScore((s) => s + (exp === 'inhale' || exp === 'exhale' ? 2 : 1))
+    } else {
+      setCurrentStreakMs(0)
+      setScore((s) => Math.max(0, s - 2))
+    }
+
+    const prevExp = phaseFromT(tSinceStart - delta)
+    if (prevExp === 'hold2' && exp === 'inhale') setCyclesCompleted((c) => c + 1)
+
+    if (tSinceStart >= durationMs) {
+      setFinished(true)
+      setRunning(false)
+      runningRef.current = false
+      finishedRef.current = true
+    }
+  })
+  return null
+}
+
 export default function BreathFlow3D({ onComplete }: Props) {
   const [running, setRunning] = useState(true)
   const [finished, setFinished] = useState(false)
@@ -75,7 +158,6 @@ export default function BreathFlow3D({ onComplete }: Props) {
   const durationMs = 90_000
 
   const cycleMs = 16_000 // 4-4-4-4
-  const phaseOrder: Phase[] = ['inhale', 'hold1', 'exhale', 'hold2']
   const phaseColors: Record<Phase, string> = {
     inhale: '#22c55e',
     hold1: '#a78bfa',
@@ -85,6 +167,19 @@ export default function BreathFlow3D({ onComplete }: Props) {
 
   const startTimeRef = useRef<number>(performance.now())
   const lastFrameRef = useRef<number>(performance.now())
+
+  const runningRef = useRef<boolean>(running)
+  useEffect(() => {
+    runningRef.current = running
+  }, [running])
+  const finishedRef = useRef<boolean>(finished)
+  useEffect(() => {
+    finishedRef.current = finished
+  }, [finished])
+  const userPhaseRef = useRef<Phase>(userPhase)
+  useEffect(() => {
+    userPhaseRef.current = userPhase
+  }, [userPhase])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -103,45 +198,6 @@ export default function BreathFlow3D({ onComplete }: Props) {
     if (mod < 12000) return 'exhale'
     return 'hold2'
   }
-
-  const ringRadius = 5
-
-  useFrame(() => {
-    if (!running || finished) return
-    const now = performance.now()
-    const delta = now - lastFrameRef.current
-    lastFrameRef.current = now
-
-    const tSinceStart = now - startTimeRef.current
-    const exp = phaseFromT(tSinceStart)
-    setExpectedPhase(exp)
-
-    // Match logic: inhale/exhale must match respective phases; holds count as match if user is neither switching (keep previous)
-    const isMatch = (exp === 'inhale' && userPhase === 'inhale') || (exp === 'exhale' && userPhase === 'exhale') || exp === 'hold1' || exp === 'hold2'
-
-    setElapsedMs((v) => v + delta)
-    if (isMatch) {
-      setMatchMs((v) => v + delta)
-      setCurrentStreakMs((s) => {
-        const next = s + delta
-        if (next > bestStreakMs) setBestStreakMs(next)
-        return next
-      })
-      setScore((s) => s + (exp === 'inhale' || exp === 'exhale' ? 2 : 1))
-    } else {
-      setCurrentStreakMs(0)
-      setScore((s) => Math.max(0, s - 2))
-    }
-
-    // Count completed cycles when crossing boundary
-    const prevExp = phaseFromT(tSinceStart - delta)
-    if (prevExp === 'hold2' && exp === 'inhale') setCyclesCompleted((c) => c + 1)
-
-    if (tSinceStart >= durationMs) {
-      setFinished(true)
-      setRunning(false)
-    }
-  })
 
   const angleFromPhase = (tMs: number) => ((tMs % cycleMs) / cycleMs) * Math.PI * 2
 
@@ -208,6 +264,26 @@ export default function BreathFlow3D({ onComplete }: Props) {
           <Ring radius={5.6} color="#93c5fd" opacity={0.15} />
           <Ring radius={5.2} color="#60a5fa" opacity={0.15} />
           <Ring radius={4.8} color="#3b82f6" opacity={0.12} />
+
+          <BreathFlowLoop
+            runningRef={runningRef}
+            finishedRef={finishedRef}
+            startTimeRef={startTimeRef}
+            lastFrameRef={lastFrameRef}
+            durationMs={durationMs}
+            cycleMs={cycleMs}
+            setExpectedPhase={setExpectedPhase}
+            setElapsedMs={setElapsedMs}
+            setMatchMs={setMatchMs}
+            setCurrentStreakMs={setCurrentStreakMs}
+            setBestStreakMs={setBestStreakMs}
+            setScore={setScore}
+            setCyclesCompleted={setCyclesCompleted}
+            phaseFromT={phaseFromT}
+            userPhaseRef={userPhaseRef}
+            setFinished={setFinished}
+            setRunning={setRunning}
+          />
 
           {/* Expected phase indicator dot */}
           <Dot angle={currentAngle} radius={4.8} color={phaseColors[expectedPhase]} />

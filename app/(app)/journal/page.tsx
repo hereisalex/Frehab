@@ -77,9 +77,12 @@ export default function JournalPage() {
     const moduleTitles: { [key: number]: string } = {
       1: 'Foundation: Understanding Recovery',
       2: 'Building Your Support System',
-      3: 'Coping Strategies',
-      4: 'Relapse Prevention',
-      5: 'Building a Fulfilling Life'
+      3: 'From Values to Habits',
+      4: 'Relapse Prevention: Triggers & Cravings',
+      5: 'Building a Fulfilling Life',
+      6: 'Resilience & Stress Management',
+      7: 'Community & Service: Connected Recovery',
+      8: 'Sustain & Grow: Future-Proof Your Recovery'
     }
     return moduleTitles[moduleNumber] || `Module ${moduleNumber}`
   }

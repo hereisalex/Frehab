@@ -50,6 +50,20 @@ const mockModules: Module[] = [
     title: 'Resilience & Stress Management: Skills for Tough Days',
     description: 'Build resilience and emotional regulation skills—reframe thoughts, reduce physiological arousal, and recover quickly from setbacks.'
   }
+  ,
+  {
+    id: 7,
+    module_number: 7,
+    title: 'Community & Service: Connected Recovery',
+    description: 'Strengthen recovery by building supportive relationships and contributing to something bigger than yourself.'
+  }
+  ,
+  {
+    id: 8,
+    module_number: 8,
+    title: 'Sustain & Grow: Future-Proof Your Recovery',
+    description: 'Consolidate skills into a sustainable system and create plans for continued growth.'
+  }
 ]
 
 export default function ProgramPage() {

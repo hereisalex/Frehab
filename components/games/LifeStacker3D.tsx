@@ -64,22 +64,21 @@ export default function LifeStacker3D({ onComplete }: Props) {
 
   const epsilon = 0.15
 
-  // Animate moving block
-  useFrame((_, delta) => {
-    if (!running || finished) return
-    setMoving((m) => {
-      let nx = m.x + m.dir * speed * delta
-      if (nx > 6) {
-        nx = 6
-        return { ...m, x: nx, dir: -1 }
-      }
-      if (nx < -6) {
-        nx = -6
-        return { ...m, x: nx, dir: 1 }
-      }
-      return { ...m, x: nx }
+  // Refs to avoid stale closures inside the Canvas loop
+  const runningRef = useRef(running)
+  useEffect(() => { runningRef.current = running }, [running])
+  const finishedRef = useRef(finished)
+  useEffect(() => { finishedRef.current = finished }, [finished])
+  const speedRef = useRef(speed)
+  useEffect(() => { speedRef.current = speed }, [speed])
+
+  function StackerLoop({ onMove }: { onMove: (delta: number) => void }) {
+    useFrame((_, delta) => {
+      if (!runningRef.current || finishedRef.current) return
+      onMove(delta)
     })
-  })
+    return null
+  }
 
   const pillarColor = useCallback((level: number) => {
     const colors = ['#0ea5e9', '#22c55e', '#a78bfa', '#f97316', '#ef4444']
@@ -194,6 +193,23 @@ export default function LifeStacker3D({ onComplete }: Props) {
           <Lights />
           <fog attach="fog" args={["#bae6fd", 10, 35]} />
           <Ground />
+          <StackerLoop
+            onMove={(delta) => {
+              setMoving((m) => {
+                const sp = speedRef.current
+                let nx = m.x + m.dir * sp * delta
+                if (nx > 6) {
+                  nx = 6
+                  return { ...m, x: nx, dir: -1 }
+                }
+                if (nx < -6) {
+                  nx = -6
+                  return { ...m, x: nx, dir: 1 }
+                }
+                return { ...m, x: nx }
+              })
+            }}
+          />
           {placedBlocks.map((b, i) => (
             <Block key={i} x={b.x} z={b.z} width={b.width} color={b.color} />
           ))}

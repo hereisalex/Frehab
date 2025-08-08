@@ -11,6 +11,8 @@ import IdentityHabitsGame from '@/components/games/IdentityHabitsGame'
 import RelapseRunner3D from '@/components/games/RelapseRunner3D'
 import LifeStacker3D from '@/components/games/LifeStacker3D'
 import BreathFlow3D from '@/components/games/BreathFlow3D'
+import CommunityBuilder from '@/components/games/CommunityBuilder'
+import FutureBuilder from '@/components/games/FutureBuilder'
 
 interface Module {
   id: number
@@ -333,6 +335,8 @@ export default function ModulePage() {
   const isModule4 = module.module_number === 4
   const isModule5 = module.module_number === 5
   const isModule6 = module.module_number === 6
+  const isModule7 = module.module_number === 7
+  const isModule8 = module.module_number === 8
 
   return (
     <div className="min-h-screen bg-background">
@@ -582,6 +586,36 @@ export default function ModulePage() {
                 </div>
                 <BreathFlow3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
               </div>
+            ) : isModule7 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Action-Based Project: Community Builder</h2>
+                  </div>
+                  <p className="text-neutral-600">Design your connection plan: list supporters, draft invitations, and choose concrete actions that reinforce recovery through community and service.</p>
+                </div>
+                <CommunityBuilder onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+              </div>
+            ) : isModule8 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Action-Based Project: Future Builder</h2>
+                  </div>
+                  <p className="text-neutral-600">Design your sustainable daily system across life domains. Select small, repeatable actions and finalize your plan.</p>
+                </div>
+                <FutureBuilder onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+              </div>
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">
@@ -640,7 +674,7 @@ export default function ModulePage() {
             )}
 
             {/* Placeholder for other modules */}
-            {!isModule1 && !isModule3 && (
+            {!isModule1 && !isModule3 && !isModule4 && !isModule5 && !isModule6 && !isModule7 && !isModule8 && (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-neutral-200 rounded-full mx-auto mb-4 flex items-center justify-center">

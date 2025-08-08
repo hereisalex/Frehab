@@ -78,6 +78,10 @@ We have successfully built the foundational "vertical slice" of the application.
 
 ✅ Design for Key Features: We have completed detailed design documents for the Achievement System and the Expandable Callout component (including animation and haptics).
 
+✅ Module 7 Seeded: Added Module 7 (Community & Service) content to the database, including lessons and tools.
+
+✅ Module 7 Activity & Achievements: Implemented the Module 7 "Community Builder" activity with journal save and achievement RPC integration (awards on invites, action plan depth, and no-skips run).
+
 4. Immediate & Future Implementation Plan
 This is our roadmap moving forward.
 
