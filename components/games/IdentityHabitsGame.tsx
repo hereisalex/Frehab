@@ -121,6 +121,11 @@ export default function IdentityHabitsGame({ onComplete }: Props) {
             result,
           },
         })
+        try {
+          await supabase.rpc('award_achievements_for_module3_game', { p_user: user.id, p_score: result.score, p_total: result.total })
+        } catch (e) {
+          // best-effort
+        }
       }
       onComplete?.(result)
     } finally {

@@ -73,10 +73,10 @@ SET content = '{
   "lessons": [
     {
       "type": "reading",
-      "title": "Atomic Habits: Systems Over Goals",
-      "summary": "Why focusing on systems and identity-based habits leads to durable behavior change.",
-      "external_url": "https://jamesclear.com/atomic-habits",
-      "button_text": "Read Article"
+      "title": "Identity-Based Habits (Open Guide)",
+      "summary": "Understand how aligning habits with identity creates durable behavior change.",
+      "external_url": "/wiki/identity-based-habits",
+      "button_text": "Read Guide"
     },
     {
       "type": "video",

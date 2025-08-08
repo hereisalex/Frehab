@@ -185,6 +185,13 @@ export default function DashboardPage() {
         throw error
       }
 
+      // Try to award achievements (best-effort)
+      try {
+        await supabase.rpc('award_achievements_for_checkin', { p_user: user.id })
+      } catch (e) {
+        console.warn('Award achievements RPC failed:', e)
+      }
+
       // Refresh custom goal data
       await fetchCustomGoalData()
     } catch (error) {

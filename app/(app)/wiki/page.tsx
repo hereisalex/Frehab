@@ -35,6 +35,9 @@ export default function WikiPage() {
           <div className="space-y-2">
             <Link href="/wiki/psychology-of-motivation"><Button variant="ghost" className="w-full justify-start">The Psychology of Motivation</Button></Link>
             <Link href="/wiki/habit-stacking"><Button variant="ghost" className="w-full justify-start">Habit Stacking</Button></Link>
+            <Link href="/wiki/identity-based-habits"><Button variant="ghost" className="w-full justify-start">Identity-Based Habits</Button></Link>
+            <Link href="/wiki/coping-menu"><Button variant="ghost" className="w-full justify-start">Create Your Coping Menu</Button></Link>
+            <Link href="/wiki/trigger-map"><Button variant="ghost" className="w-full justify-start">Trigger & Craving Map</Button></Link>
           </div>
         </div>
       </div>
