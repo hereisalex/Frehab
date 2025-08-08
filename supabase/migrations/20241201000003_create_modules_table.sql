@@ -1,5 +1,5 @@
 -- Create modules table for the Core Program
-CREATE TABLE modules (
+CREATE TABLE IF NOT EXISTS modules (
     id SERIAL PRIMARY KEY,
     module_number INTEGER NOT NULL UNIQUE,
     title TEXT NOT NULL,
@@ -15,7 +15,16 @@ COMMENT ON COLUMN modules.title IS 'Module title displayed to users';
 COMMENT ON COLUMN modules.description IS 'Detailed description of module content and goals';
 
 -- Create indexes for better query performance
-CREATE INDEX idx_modules_module_number ON modules(module_number);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_modules_module_number'
+      AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_modules_module_number ON modules(module_number);
+  END IF;
+END $$;
 CREATE INDEX idx_modules_created_at ON modules(created_at);
 
 -- Insert placeholder data for Module 1 and Module 2

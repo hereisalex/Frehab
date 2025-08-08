@@ -1,5 +1,5 @@
 -- Create journal_entries table for user journal entries
-CREATE TABLE journal_entries (
+CREATE TABLE IF NOT EXISTS journal_entries (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     module_number INTEGER NOT NULL,
@@ -16,7 +16,16 @@ COMMENT ON COLUMN journal_entries.module_number IS 'The module number this entry
 COMMENT ON COLUMN journal_entries.content IS 'JSON object containing the structured answers for the module';
 
 -- Create indexes for better query performance
-CREATE INDEX idx_journal_entries_user_id ON journal_entries(user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_journal_entries_user_id'
+      AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_journal_entries_user_id ON journal_entries(user_id);
+  END IF;
+END $$;
 CREATE INDEX idx_journal_entries_module_number ON journal_entries(module_number);
 CREATE INDEX idx_journal_entries_created_at ON journal_entries(created_at);
 CREATE INDEX idx_journal_entries_user_module ON journal_entries(user_id, module_number);
