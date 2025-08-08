@@ -1,12 +1,11 @@
--- Add custom goal description column to profiles table
+-- Add custom goal description column to profiles table (idempotent)
 ALTER TABLE profiles 
-ADD COLUMN goal_custom_description TEXT;
+ADD COLUMN IF NOT EXISTS goal_custom_description TEXT;
 
--- Add comment to document the column
 COMMENT ON COLUMN profiles.goal_custom_description IS 'The custom goal description for users who choose custom goal type';
 
--- Create daily_checkins table
-CREATE TABLE daily_checkins (
+-- Create daily_checkins table (idempotent)
+CREATE TABLE IF NOT EXISTS daily_checkins (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     checkin_date DATE NOT NULL,
@@ -19,10 +18,10 @@ COMMENT ON TABLE daily_checkins IS 'Daily check-in records for custom goal track
 COMMENT ON COLUMN daily_checkins.user_id IS 'Reference to the user profile';
 COMMENT ON COLUMN daily_checkins.checkin_date IS 'The date of the check-in';
 
--- Create indexes for better query performance
-CREATE INDEX idx_daily_checkins_user_id ON daily_checkins(user_id);
-CREATE INDEX idx_daily_checkins_date ON daily_checkins(checkin_date);
-CREATE INDEX idx_daily_checkins_user_date ON daily_checkins(user_id, checkin_date);
+-- Create indexes for better query performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_user_id ON daily_checkins(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_date ON daily_checkins(checkin_date);
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_user_date ON daily_checkins(user_id, checkin_date);
 
 -- Create a function to calculate current streak
 CREATE OR REPLACE FUNCTION calculate_current_streak(user_uuid UUID)

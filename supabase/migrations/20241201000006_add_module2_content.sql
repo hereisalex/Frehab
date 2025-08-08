@@ -1,4 +1,13 @@
 -- Add content for Module 2: Building Your Support System
+-- Ensure module 2 exists
+INSERT INTO modules (module_number, title, description)
+VALUES (
+  2,
+  'Building Your Support System',
+  'Strengthen your recovery with knowledge and tools that improve resilience and support.'
+) ON CONFLICT (module_number) DO NOTHING;
+
+-- Update content for module 2
 UPDATE modules 
 SET content = '{
   "lessons": [

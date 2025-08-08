@@ -1,11 +1,26 @@
 -- Add content column to modules table for structured lesson and tool content
-ALTER TABLE modules ADD COLUMN content JSONB;
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='modules' AND column_name='content'
+  ) THEN
+    ALTER TABLE modules ADD COLUMN content JSONB;
+  END IF;
+END $$;
 
 -- Add comment to document the new column
 COMMENT ON COLUMN modules.content IS 'JSON object containing structured content for lessons and tools';
 
 -- Create index for better query performance on content column
-CREATE INDEX idx_modules_content ON modules USING GIN (content);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_modules_content' AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_modules_content ON modules USING GIN (content);
+  END IF;
+END $$;
 
 -- Update existing modules with initial content structure
 UPDATE modules 
