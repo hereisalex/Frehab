@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import PersonalBalanceSheet from '@/components/PersonalBalanceSheet'
 import ValuesToHabitsPlanner from '@/components/ValuesToHabitsPlanner'
+import IdentityHabitsGame from '@/components/games/IdentityHabitsGame'
 
 interface Module {
   id: number
@@ -524,7 +525,12 @@ export default function ModulePage() {
             {isModule1 ? (
               <PersonalBalanceSheet onSave={handleProjectSaved} />
             ) : isModule3 ? (
-              <ValuesToHabitsPlanner onSave={handleProjectSaved} />
+              <>
+                <ValuesToHabitsPlanner onSave={handleProjectSaved} />
+                <div className="mt-6">
+                  <IdentityHabitsGame onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+                </div>
+              </>
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">
