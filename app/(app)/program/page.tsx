@@ -31,6 +31,12 @@ const mockModules: Module[] = [
     module_number: 3,
     title: 'From Values to Habits: Build Your Recovery System',
     description: 'Translate your core values into small, repeatable habits. Design systems that make the right choice the easy choice, aligning daily actions with the life you want.'
+  },
+  {
+    id: 4,
+    module_number: 4,
+    title: 'Relapse Prevention: Master Triggers and Cravings',
+    description: 'Build a robust plan to anticipate high-risk situations, manage cravings, and recover quickly from slips. Learn evidence-based skills like urge surfing, HALT checks, and coping menus.'
   }
 ]
 
