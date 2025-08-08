@@ -35,10 +35,12 @@ jobs:
       - name: Push migrations to remote (non-interactive)
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          # Force Go resolver to prefer IPv4 to avoid IPv6 connectivity issues in runners
+          GODEBUG: ipv6=0
+          PGCONNECT_TIMEOUT: 20
         run: |
-          # Construct a direct Postgres connection string to avoid interactive prompts
-          DB_URL="postgres://postgres:${SUPABASE_DB_PASSWORD}@db.avlfffrocdabopmssohw.supabase.co:5432/postgres?sslmode=require"
-          # Push migrations using the explicit DB URL
+          # Use pooled connection host and correct port (6543) with project-scoped user
+          DB_URL="postgres://postgres.avlfffrocdabopmssohw:${SUPABASE_DB_PASSWORD}@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require"
           supabase db push --db-url "$DB_URL" --debug
 
 
