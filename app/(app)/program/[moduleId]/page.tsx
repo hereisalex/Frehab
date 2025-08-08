@@ -13,6 +13,8 @@ import LifeStacker3D from '@/components/games/LifeStacker3D'
 import BreathFlow3D from '@/components/games/BreathFlow3D'
 import CommunityBuilder from '@/components/games/CommunityBuilder'
 import FutureBuilder from '@/components/games/FutureBuilder'
+import SupportNetwork3D from '@/components/games/SupportNetwork3D'
+import RoutineArchitect3D from '@/components/games/RoutineArchitect3D'
 
 interface Module {
   id: number
@@ -612,8 +614,7 @@ export default function ModulePage() {
                   <p className="text-neutral-600">Connect allies, avoid drains, and ride momentum boosts to practice building a supportive network under pressure.</p>
                 </div>
                 <div className="mt-2">
-                  {/* lazy import to keep SSR stable is not required here; keeping direct import */}
-                  {React.createElement(require('@/components/games/SupportNetwork3D').default, { onComplete: () => saveProgressToStorage({ projectCompleted: true }) })}
+                  <SupportNetwork3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
                 </div>
               </div>
             ) : isModule8 ? (
@@ -642,7 +643,7 @@ export default function ModulePage() {
                   <p className="text-neutral-600">Stack well-aligned routine blocks to build a stable foundation. Better alignment earns more points.</p>
                 </div>
                 <div className="mt-2">
-                  {React.createElement(require('@/components/games/RoutineArchitect3D').default, { onComplete: () => saveProgressToStorage({ projectCompleted: true }) })}
+                  <RoutineArchitect3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
                 </div>
               </div>
             ) : (
