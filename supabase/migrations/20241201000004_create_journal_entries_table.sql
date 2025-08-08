@@ -15,7 +15,7 @@ COMMENT ON COLUMN journal_entries.user_id IS 'Reference to the user who created 
 COMMENT ON COLUMN journal_entries.module_number IS 'The module number this entry is associated with';
 COMMENT ON COLUMN journal_entries.content IS 'JSON object containing the structured answers for the module';
 
--- Create indexes for better query performance
+-- Create indexes for better query performance (idempotent)
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_class c
@@ -26,15 +26,54 @@ DO $$ BEGIN
     CREATE INDEX idx_journal_entries_user_id ON journal_entries(user_id);
   END IF;
 END $$;
-CREATE INDEX idx_journal_entries_module_number ON journal_entries(module_number);
-CREATE INDEX idx_journal_entries_created_at ON journal_entries(created_at);
-CREATE INDEX idx_journal_entries_user_module ON journal_entries(user_id, module_number);
 
--- Create trigger to automatically update updated_at
-CREATE TRIGGER update_journal_entries_updated_at 
-    BEFORE UPDATE ON journal_entries 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_journal_entries_module_number'
+      AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_journal_entries_module_number ON journal_entries(module_number);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_journal_entries_created_at'
+      AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_journal_entries_created_at ON journal_entries(created_at);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_journal_entries_user_module'
+      AND n.nspname = 'public'
+  ) THEN
+    CREATE INDEX idx_journal_entries_user_module ON journal_entries(user_id, module_number);
+  END IF;
+END $$;
+
+-- Create trigger to automatically update updated_at (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'update_journal_entries_updated_at'
+  ) THEN
+    CREATE TRIGGER update_journal_entries_updated_at 
+      BEFORE UPDATE ON journal_entries 
+      FOR EACH ROW 
+      EXECUTE FUNCTION update_updated_at_column();
+  END IF;
+END $$;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
