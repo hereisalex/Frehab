@@ -1,5 +1,5 @@
--- Create profiles table for user data
-CREATE TABLE profiles (
+-- Create profiles table for user data (idempotent)
+CREATE TABLE IF NOT EXISTS profiles (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     full_name TEXT,
@@ -15,11 +15,11 @@ COMMENT ON COLUMN profiles.email IS 'User email address (unique)';
 COMMENT ON COLUMN profiles.full_name IS 'User full name';
 COMMENT ON COLUMN profiles.avatar_url IS 'URL to user avatar image';
 
--- Create indexes for better query performance
-CREATE INDEX idx_profiles_email ON profiles(email);
-CREATE INDEX idx_profiles_created_at ON profiles(created_at);
+-- Create indexes for better query performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_created_at ON profiles(created_at);
 
--- Create a function to update the updated_at timestamp
+-- Create a function to update the updated_at timestamp (safe)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -28,8 +28,17 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Create trigger to automatically update updated_at
-CREATE TRIGGER update_profiles_updated_at 
-    BEFORE UPDATE ON profiles 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column(); 
+-- Create trigger to automatically update updated_at (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'update_profiles_updated_at'
+  ) THEN
+    CREATE TRIGGER update_profiles_updated_at 
+      BEFORE UPDATE ON profiles 
+      FOR EACH ROW 
+      EXECUTE FUNCTION update_updated_at_column();
+  END IF;
+END $$;
