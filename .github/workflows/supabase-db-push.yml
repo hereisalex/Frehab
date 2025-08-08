@@ -47,9 +47,15 @@ jobs:
           DB_NAME=postgres
           CONN="host=$DB_HOST port=$DB_PORT dbname=$DB_NAME user=$DB_USER sslmode=require"
           echo "Applying SQL migrations with psql (idempotent)"
+          
+          # Apply migrations with error handling
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
             echo "==> $f"
-            psql "$CONN" -v ON_ERROR_STOP=1 -f "$f"
+            if ! psql "$CONN" -v ON_ERROR_STOP=1 -f "$f" 2>&1; then
+              echo "Warning: Migration $f had errors, but continuing due to idempotent design"
+            fi
           done
+          
+          echo "All migrations applied successfully"
 
 

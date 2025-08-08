@@ -75,22 +75,46 @@ BEGIN
   END IF;
 END $$;
 
--- Enable Row Level Security (RLS)
+-- Enable Row Level Security (RLS) - safe to run multiple times
 ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policies
--- Users can only view their own journal entries
-CREATE POLICY "Users can view own journal entries" ON journal_entries
-    FOR SELECT USING (auth.uid() = user_id);
+-- Create RLS policies (idempotent)
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'journal_entries' AND policyname = 'Users can view own journal entries'
+  ) THEN
+    CREATE POLICY "Users can view own journal entries" ON journal_entries
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
--- Users can only insert their own journal entries
-CREATE POLICY "Users can insert own journal entries" ON journal_entries
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'journal_entries' AND policyname = 'Users can insert own journal entries'
+  ) THEN
+    CREATE POLICY "Users can insert own journal entries" ON journal_entries
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
--- Users can only update their own journal entries
-CREATE POLICY "Users can update own journal entries" ON journal_entries
-    FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'journal_entries' AND policyname = 'Users can update own journal entries'
+  ) THEN
+    CREATE POLICY "Users can update own journal entries" ON journal_entries
+      FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
--- Users can only delete their own journal entries
-CREATE POLICY "Users can delete own journal entries" ON journal_entries
-    FOR DELETE USING (auth.uid() = user_id); 
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'journal_entries' AND policyname = 'Users can delete own journal entries'
+  ) THEN
+    CREATE POLICY "Users can delete own journal entries" ON journal_entries
+      FOR DELETE USING (auth.uid() = user_id);
+  END IF;
+END $$; 
