@@ -90,3 +90,5 @@ SET content = '{
 }'::jsonb
 WHERE module_number = 3;-- Trigger DB update - testing workflow
 -- Trigger DB update - testing workflow
+
+-- workflow trigger: non-interactive db push test
