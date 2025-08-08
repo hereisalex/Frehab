@@ -79,6 +79,73 @@ function Lights() {
   )
 }
 
+function NetworkLoop({
+  runningRef,
+  entitiesRef,
+  playerLaneRef,
+  speedRef,
+  setConnections,
+  setStreak,
+  setBestStreak,
+  setScore,
+  setDrainsHit,
+  elapsedMsRef,
+}: {
+  runningRef: React.MutableRefObject<boolean>
+  entitiesRef: React.MutableRefObject<Entity[]>
+  playerLaneRef: React.MutableRefObject<Lane>
+  speedRef: React.MutableRefObject<number>
+  setConnections: React.Dispatch<React.SetStateAction<number>>
+  setStreak: React.Dispatch<React.SetStateAction<number>>
+  setBestStreak: React.Dispatch<React.SetStateAction<number>>
+  setScore: React.Dispatch<React.SetStateAction<number>>
+  setDrainsHit: React.Dispatch<React.SetStateAction<number>>
+  elapsedMsRef: React.MutableRefObject<number>
+}) {
+  useFrame((_, delta) => {
+    if (!runningRef.current) return
+    elapsedMsRef.current += delta * 1000
+    // Move entities
+    entitiesRef.current = entitiesRef.current
+      .map((e) => ({ ...e, z: e.z + speedRef.current * delta * 10 }))
+      .filter((e) => e.z < 12)
+
+    const thresholdZ = 2.0
+    const remaining: Entity[] = []
+    for (const e of entitiesRef.current) {
+      if (e.z >= thresholdZ - 0.6 && e.z <= thresholdZ + 0.6 && e.lane === playerLaneRef.current) {
+        if (e.type === 'ally') {
+          setConnections((c) => c + 1)
+          setStreak((s) => {
+            const ns = s + 1
+            setBestStreak((b) => (ns > b ? ns : b))
+            return ns
+          })
+          setScore((s) => s + 3)
+        } else if (e.type === 'drain') {
+          setDrainsHit((d) => d + 1)
+          setStreak(0)
+          setScore((s) => Math.max(0, s - 3))
+        } else {
+          speedRef.current = Math.min(1.6, speedRef.current + 0.1)
+          setScore((s) => s + 2)
+        }
+        continue
+      }
+      remaining.push(e)
+    }
+    entitiesRef.current = remaining
+
+    // Spawns
+    if (Math.random() < 0.035) {
+      const roll = Math.random()
+      const type: EntityType = roll < 0.6 ? 'ally' : roll < 0.85 ? 'drain' : 'boost'
+      entitiesRef.current.push({ id: crypto.randomUUID(), lane: ([-1,0,1] as Lane[])[Math.floor(Math.random()*3)], z: -30, type })
+    }
+  })
+  return null
+}
+
 export default function SupportNetwork3D({ onComplete }: Props) {
   const [running, setRunning] = useState(true)
   const [lane, setLane] = useState<Lane>(0)
@@ -136,49 +203,7 @@ export default function SupportNetwork3D({ onComplete }: Props) {
     }
   }, [countdown, finished])
 
-  useFrame((_, delta) => {
-    if (!running) return
-    elapsedMsRef.current += delta * 1000
-    // Move entities
-    entitiesRef.current = entitiesRef.current
-      .map((e) => ({ ...e, z: e.z + speedRef.current * delta * 10 }))
-      .filter((e) => e.z < 12)
-
-    // Collisions
-    const thresholdZ = 2.0
-    const remaining: Entity[] = []
-    for (const e of entitiesRef.current) {
-      if (e.z >= thresholdZ - 0.6 && e.z <= thresholdZ + 0.6 && e.lane === playerLaneRef.current) {
-        if (e.type === 'ally') {
-          setConnections((c) => c + 1)
-          setStreak((s) => {
-            const ns = s + 1
-            setBestStreak((b) => (ns > b ? ns : b))
-            return ns
-          })
-          setScore((s) => s + 3)
-        } else if (e.type === 'drain') {
-          setDrainsHit((d) => d + 1)
-          setStreak(0)
-          setScore((s) => Math.max(0, s - 3))
-        } else {
-          // boost: increase speed and award points
-          speedRef.current = Math.min(1.6, speedRef.current + 0.1)
-          setScore((s) => s + 2)
-        }
-        continue
-      }
-      remaining.push(e)
-    }
-    entitiesRef.current = remaining
-
-    // Spawns
-    if (Math.random() < 0.035) {
-      const roll = Math.random()
-      const type: EntityType = roll < 0.6 ? 'ally' : roll < 0.85 ? 'drain' : 'boost'
-      entitiesRef.current.push({ id: crypto.randomUUID(), lane: randomLane(), z: -30, type })
-    }
-  })
+  // loop handled inside Canvas by NetworkLoop
 
   const saveResult = useCallback(async () => {
     setSubmitting(true)
@@ -240,6 +265,18 @@ export default function SupportNetwork3D({ onComplete }: Props) {
           <Lights />
           <fog attach="fog" args={["#e0f2fe", 8, 40]} />
           <Ground />
+          <NetworkLoop
+            runningRef={useRef(running)}
+            entitiesRef={entitiesRef}
+            playerLaneRef={playerLaneRef}
+            speedRef={speedRef}
+            setConnections={setConnections}
+            setStreak={setStreak}
+            setBestStreak={setBestStreak}
+            setScore={setScore}
+            setDrainsHit={setDrainsHit}
+            elapsedMsRef={elapsedMsRef}
+          />
           {/* lane stripes */}
           <mesh position={[-2.2, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[1.2, 200]} />

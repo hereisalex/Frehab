@@ -61,6 +61,29 @@ function BlockMesh({ x, z, width, color }: { x: number; z: number; width: number
   )
 }
 
+function RoutineLoop({
+  runningRef,
+  finishedRef,
+  speedRef,
+  setMoving,
+}: {
+  runningRef: React.MutableRefObject<boolean>
+  finishedRef: React.MutableRefObject<boolean>
+  speedRef: React.MutableRefObject<number>
+  setMoving: React.Dispatch<React.SetStateAction<Moving>>
+}) {
+  useFrame((_, delta) => {
+    if (!runningRef.current || finishedRef.current) return
+    setMoving((m) => {
+      let nx = m.x + m.dir * speedRef.current * delta
+      if (nx > 6) return { ...m, x: 6, dir: -1 }
+      if (nx < -6) return { ...m, x: -6, dir: 1 }
+      return { ...m, x: nx }
+    })
+  })
+  return null
+}
+
 export default function RoutineArchitect3D({ onComplete }: Props) {
   const [running, setRunning] = useState(true)
   const [placed, setPlaced] = useState<Block[]>([{ id: crypto.randomUUID(), x: 0, z: 0, width: 6, color: '#60a5fa' }])
@@ -71,21 +94,26 @@ export default function RoutineArchitect3D({ onComplete }: Props) {
   const [finished, setFinished] = useState(false)
   const [saving, setSaving] = useState(false)
   const startRef = useRef<number>(performance.now())
+  const runningRef = useRef<boolean>(running)
+  const finishedRef = useRef<boolean>(finished)
+  const speedRef = useRef<number>(speed)
+
+  useEffect(() => {
+    runningRef.current = running
+  }, [running])
+  useEffect(() => {
+    finishedRef.current = finished
+  }, [finished])
+  useEffect(() => {
+    speedRef.current = speed
+  }, [speed])
 
   const pillarColor = useCallback((level: number) => {
     const colors = ['#0ea5e9', '#22c55e', '#a78bfa', '#f97316', '#ef4444']
     return colors[level % colors.length]
   }, [])
 
-  useFrame((_, delta) => {
-    if (!running || finished) return
-    setMoving((m) => {
-      let nx = m.x + m.dir * speed * delta
-      if (nx > 6) return { ...m, x: 6, dir: -1 }
-      if (nx < -6) return { ...m, x: -6, dir: 1 }
-      return { ...m, x: nx }
-    })
-  })
+  // animation handled by RoutineLoop inside Canvas
 
   const place = useCallback(() => {
     if (finished) return
@@ -185,6 +213,7 @@ export default function RoutineArchitect3D({ onComplete }: Props) {
           <Lights />
           <fog attach="fog" args={["#ecfeff", 10, 35]} />
           <Ground />
+          <RoutineLoop runningRef={runningRef} finishedRef={finishedRef} speedRef={speedRef} setMoving={setMoving} />
           {placed.map((b) => (
             <BlockMesh key={b.id} x={b.x} z={b.z} width={b.width} color={b.color} />
           ))}
