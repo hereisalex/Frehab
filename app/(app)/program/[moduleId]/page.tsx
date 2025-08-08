@@ -600,6 +600,21 @@ export default function ModulePage() {
                   <p className="text-neutral-600">Design your connection plan: list supporters, draft invitations, and choose concrete actions that reinforce recovery through community and service.</p>
                 </div>
                 <CommunityBuilder onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Interactive Game: Support Network (3D)</h2>
+                  </div>
+                  <p className="text-neutral-600">Connect allies, avoid drains, and ride momentum boosts to practice building a supportive network under pressure.</p>
+                </div>
+                <div className="mt-2">
+                  {/* lazy import to keep SSR stable is not required here; keeping direct import */}
+                  {React.createElement(require('@/components/games/SupportNetwork3D').default, { onComplete: () => saveProgressToStorage({ projectCompleted: true }) })}
+                </div>
               </div>
             ) : isModule8 ? (
               <div className="space-y-6">
@@ -615,6 +630,20 @@ export default function ModulePage() {
                   <p className="text-neutral-600">Design your sustainable daily system across life domains. Select small, repeatable actions and finalize your plan.</p>
                 </div>
                 <FutureBuilder onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Interactive Game: Routine Architect (3D)</h2>
+                  </div>
+                  <p className="text-neutral-600">Stack well-aligned routine blocks to build a stable foundation. Better alignment earns more points.</p>
+                </div>
+                <div className="mt-2">
+                  {React.createElement(require('@/components/games/RoutineArchitect3D').default, { onComplete: () => saveProgressToStorage({ projectCompleted: true }) })}
+                </div>
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
