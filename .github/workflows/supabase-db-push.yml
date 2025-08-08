@@ -32,15 +32,24 @@ jobs:
       - name: Link project
         run: supabase link --project-ref avlfffrocdabopmssohw
 
-      - name: Push migrations to remote (non-interactive)
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Apply migrations via psql (idempotent)
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          # Force Go resolver to prefer IPv4 to avoid IPv6 connectivity issues in runners
-          GODEBUG: ipv6=0
-          PGCONNECT_TIMEOUT: 20
         run: |
-          # Use pooled connection host and correct port (6543) with project-scoped user
-          DB_URL="postgres://postgres.avlfffrocdabopmssohw:${SUPABASE_DB_PASSWORD}@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require"
-          supabase db push --db-url "$DB_URL" --debug
+          set -euo pipefail
+          export PGPASSWORD="$SUPABASE_DB_PASSWORD"
+          DB_HOST=aws-0-us-east-2.pooler.supabase.com
+          DB_PORT=6543
+          DB_USER=postgres.avlfffrocdabopmssohw
+          DB_NAME=postgres
+          CONN="host=$DB_HOST port=$DB_PORT dbname=$DB_NAME user=$DB_USER sslmode=require"
+          echo "Applying SQL migrations with psql (idempotent)"
+          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+            echo "==> $f"
+            psql "$CONN" -v ON_ERROR_STOP=1 -f "$f"
+          done
 
 
