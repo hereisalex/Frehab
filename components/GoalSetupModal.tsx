@@ -111,7 +111,7 @@ export default function GoalSetupModal({ isOpen, onClose, onSave, currentGoalTyp
       <div className="space-y-6">
         <div>
           <p className="text-slate-600 mb-6">
-            Choose how you'd like to track your recovery journey. You can change this anytime.
+            Choose how you&apos;d like to track your recovery journey. You can change this anytime.
           </p>
           
           {/* Goal Options */}
@@ -171,7 +171,7 @@ export default function GoalSetupModal({ isOpen, onClose, onSave, currentGoalTyp
                 required
               />
               <p className="text-xs text-slate-500 mt-2">
-                This will be your daily check-in goal. You'll mark it as complete each day.
+                 This will be your daily check-in goal. You&apos;ll mark it as complete each day.
               </p>
             </div>
           )}

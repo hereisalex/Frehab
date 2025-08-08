@@ -8,6 +8,9 @@ import Link from 'next/link'
 import PersonalBalanceSheet from '@/components/PersonalBalanceSheet'
 import ValuesToHabitsPlanner from '@/components/ValuesToHabitsPlanner'
 import IdentityHabitsGame from '@/components/games/IdentityHabitsGame'
+import RelapseRunner3D from '@/components/games/RelapseRunner3D'
+import LifeStacker3D from '@/components/games/LifeStacker3D'
+import BreathFlow3D from '@/components/games/BreathFlow3D'
 
 interface Module {
   id: number
@@ -327,6 +330,9 @@ export default function ModulePage() {
   // Check if this is Module 1 for the Personal Balance Sheet component
   const isModule1 = module.module_number === 1
   const isModule3 = module.module_number === 3
+  const isModule4 = module.module_number === 4
+  const isModule5 = module.module_number === 5
+  const isModule6 = module.module_number === 6
 
   return (
     <div className="min-h-screen bg-background">
@@ -531,6 +537,51 @@ export default function ModulePage() {
                   <IdentityHabitsGame onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
                 </div>
               </>
+            ) : isModule4 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Action-Based Project: Urge Surf Runner (3D)</h2>
+                  </div>
+                  <p className="text-neutral-600">Practice avoiding triggers and collecting coping tools while you move between lanes. Use the experience to reinforce HALT checks and if-then planning.</p>
+                </div>
+                <RelapseRunner3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+              </div>
+            ) : isModule5 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Action-Based Project: Life Stacker (3D)</h2>
+                  </div>
+                  <p className="text-neutral-600">Design a stable life by stacking small consistent habits across your core pillars. Perfect alignment represents identity-consistent actions.</p>
+                </div>
+                <LifeStacker3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+              </div>
+            ) : isModule6 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Action-Based Project: BreathFlow (3D)</h2>
+                  </div>
+                  <p className="text-neutral-600">Practice paced breathing and phase awareness to reduce physiological arousal and build resilience. Match inhale/exhale with the guided cycle.</p>
+                </div>
+                <BreathFlow3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
+              </div>
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.39.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -16,7 +18,8 @@
     "react": "^18",
     "react-dom": "^18",
     "supabase": "^2.33.9",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "three": "^0.160.1"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -12,12 +12,6 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Debug logging
-if (typeof window !== 'undefined') {
-  console.log('Supabase URL available:', !!supabaseUrl)
-  console.log('Supabase Anon Key available:', !!supabaseAnonKey)
-}
-
 // Check if we're in the browser and environment variables are missing
 if (typeof window !== 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
   console.error('Missing Supabase environment variables. Please check your .env.local file.')
@@ -33,9 +27,15 @@ const createMockClient = () => {
         eq: () => ({
           single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
         }),
+        gte: () => ({
+          order: () => Promise.resolve({ data: [], error: { message: 'Supabase not configured' } })
+        }),
         order: () => Promise.resolve({ data: [], error: { message: 'Supabase not configured' } })
-      })
+      }),
+      insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+      upsert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
     }),
+    rpc: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
     auth: {
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
       signInWithOAuth: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
@@ -44,10 +44,10 @@ const createMockClient = () => {
   }
 }
 
-// Export the real client if environment variables are available, otherwise export mock client
-export const supabase = supabaseUrl && supabaseAnonKey 
+// Export the real client if environment variables are available, otherwise export mock client.
+// We annotate as `any` to keep type-checking permissive during development without Supabase.
+export const supabase: any = supabaseUrl && supabaseAnonKey 
   ? (() => {
-      console.log('Using real Supabase client')
       return createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
           autoRefreshToken: true,
@@ -56,4 +56,4 @@ export const supabase = supabaseUrl && supabaseAnonKey
         }
       })
     })()
-  : createMockClient() 
+  : createMockClient()

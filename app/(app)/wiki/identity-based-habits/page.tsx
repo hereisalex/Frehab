@@ -30,8 +30,8 @@ export default function IdentityBasedHabitsPage() {
             <h2>Why Identity Matters</h2>
             <p>
               Research in behavior change shows that habits stick better when they reinforce a chosen identity.
-              Instead of focusing on outcomes (e.g., days sober), we ask: "What would a sober, healthy, caring
-              person do right now?" This reframes actions as votes for the person you&apos;re becoming.
+              Instead of focusing on outcomes (e.g., days sober), we ask: &quot;What would a sober, healthy, caring
+              person do right now?&quot; This reframes actions as votes for the person you&apos;re becoming.
             </p>
 
             <h2>Core Principles</h2>
@@ -39,13 +39,13 @@ export default function IdentityBasedHabitsPage() {
               <li><strong>Make it small:</strong> Start with a behavior so easy you can&apos;t fail.</li>
               <li><strong>Make it obvious:</strong> Use visual cues and environment design.</li>
               <li><strong>Make it satisfying:</strong> Add immediate positive feedback.</li>
-              <li><strong>Make it identity-linked:</strong> Say it out loud: "I am someone who …"</li>
+              <li><strong>Make it identity-linked:</strong> Say it out loud: &quot;I am someone who …&quot;</li>
             </ul>
 
             <h2>Implementation Intentions</h2>
             <p>
-              Form an if-then plan to make the behavior automatic: <em>"If I feel an urge after dinner, then I will
-              take a 3-minute walk and text my accountability buddy."</em>
+              Form an if-then plan to make the behavior automatic: <em>&quot;If I feel an urge after dinner, then I will
+              take a 3-minute walk and text my accountability buddy.&quot;</em>
             </p>
 
             <h2>Evidence & Further Reading (Open)</h2>
@@ -57,7 +57,7 @@ export default function IdentityBasedHabitsPage() {
 
             <h2>Try It Now</h2>
             <ol>
-              <li>Write a one-sentence identity: "I am a person who …"</li>
+              <li>Write a one-sentence identity: &quot;I am a person who …&quot;</li>
               <li>Pick one 2-minute habit that expresses that identity.</li>
               <li>Attach it to a daily anchor (habit stacking).</li>
               <li>Track it for one week. Celebrate consistency, not perfection.</li>

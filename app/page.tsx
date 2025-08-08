@@ -30,7 +30,7 @@ export default function Home() {
         
         <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
           Frehab is an online addiction recovery platform that provides a safe, supportive environment 
-          for individuals seeking recovery. Join our community and discover a path to healing that's 
+          for individuals seeking recovery. Join our community and discover a path to healing that&apos;s 
           built on compassion, understanding, and shared experience.
         </p>
         

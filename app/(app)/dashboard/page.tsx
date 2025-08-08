@@ -41,7 +41,7 @@ export default function DashboardPage() {
           .eq('id', user.id)
           .single()
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        if (error && (('code' in error) ? error.code !== 'PGRST116' : true)) { // PGRST116 is "not found"
           console.error('Error fetching goal data:', error)
         }
 
@@ -117,9 +117,7 @@ export default function DashboardPage() {
           date.setDate(date.getDate() - i)
           const dateStr = date.toISOString().split('T')[0]
           
-          const checkedIn = checkinsData?.some(checkin => 
-            checkin.checkin_date === dateStr
-          ) || false
+          const checkedIn = (checkinsData as Array<{ checkin_date: string }> | null | undefined)?.some((checkin) => checkin.checkin_date === dateStr) || false
           
           lastWeek.push(checkedIn)
         }
@@ -470,8 +468,8 @@ export default function DashboardPage() {
           {/* Progress Summary Widget */}
           <div className="lg:col-span-2 xl:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
-              <h2 className="text-xl font-semibold text-slate-700 mb-4">
-                This Week's Progress
+            <h2 className="text-xl font-semibold text-slate-700 mb-4">
+                This Week&apos;s Progress
               </h2>
               
               <div className="space-y-4">
@@ -517,7 +515,7 @@ export default function DashboardPage() {
           onClose={() => setIsModalOpen(false)}
           onSave={handleSaveGoal}
           currentGoalType={goalType}
-          currentStartDate={goalStartDate}
+          currentStartDate={goalStartDate ?? undefined}
           currentCustomDescription={goalCustomDescription}
         />
      </div>

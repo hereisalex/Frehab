@@ -37,6 +37,18 @@ const mockModules: Module[] = [
     module_number: 4,
     title: 'Relapse Prevention: Master Triggers and Cravings',
     description: 'Build a robust plan to anticipate high-risk situations, manage cravings, and recover quickly from slips. Learn evidence-based skills like urge surfing, HALT checks, and coping menus.'
+  },
+  {
+    id: 5,
+    module_number: 5,
+    title: 'Building a Fulfilling Life',
+    description: 'Design a balanced life that makes recovery rewarding. Align your time with your values and stack identity-based habits across core pillars.'
+  },
+  {
+    id: 6,
+    module_number: 6,
+    title: 'Resilience & Stress Management: Skills for Tough Days',
+    description: 'Build resilience and emotional regulation skills—reframe thoughts, reduce physiological arousal, and recover quickly from setbacks.'
   }
 ]
 
@@ -108,7 +120,7 @@ export default function ProgramPage() {
               <div>
                 <h3 className="text-sm font-medium text-yellow-800">Development Mode</h3>
                 <p className="text-sm text-yellow-700 mt-1">
-                  Supabase is not configured. You're seeing demo data. To connect to a real database, 
+                   Supabase is not configured. You&apos;re seeing demo data. To connect to a real database, 
                   create a <code className="bg-yellow-100 px-1 rounded">.env.local</code> file with your Supabase credentials.
                 </p>
               </div>
@@ -233,7 +245,7 @@ export default function ProgramPage() {
               More Modules Coming Soon
             </h3>
             <p className="text-neutral-600 mb-4">
-              We're working on additional modules to support your recovery journey. 
+               We&apos;re working on additional modules to support your recovery journey. 
               Future modules will cover topics like coping strategies, relapse prevention, 
               and building a fulfilling life in recovery.
             </p>

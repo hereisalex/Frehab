@@ -4,12 +4,17 @@ Current Domain: Frehab.org
 
 1. Project Vision & Guiding Philosophy
 Mission: To create a free, anonymous, and inclusive online platform that provides an evidence-based, community-powered path to recovery from any addiction.
+Problem: we know that the majority of people who need help don't get it, and we know that the majority of people who get help don't get the help they need, whether that's because it's the wrong kind of help, or it's not enough help.
+Frehab's goal is to bridge the gap by minimizing the friction that exists between most addicts and the recovery they need, by making it as easy, free, fun and rewarding as possible to encourage people to get help. 
+Finally, Frehab is committed to reducing the stigma around addiction and recovery, which drives the shame that prevents so many from asking for help when they need it.
 
 Core Philosophies:
 
 "Odin Project" Model: We provide a structured, linear curriculum that guides users through a comprehensive program, rather than just offering a collection of tools.
 
 "Core + Multi-Specialization" Architecture: The curriculum consists of a universal Core program (the "operating system" of recovery) enhanced with specialized content blocks tailored to the multiple, specific addictions a user selects (e.g., Alcohol, Gambling, Stimulants).
+
+No links to paid resources!
 
 Inclusivity & Harm Reduction: We explicitly support all recovery paths, including abstinence, moderation, and harm reduction. This is embodied by our flexible "Personal Goal Tracker."
 
