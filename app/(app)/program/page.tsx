@@ -37,6 +37,12 @@ const mockModules: Module[] = [
     module_number: 4,
     title: 'Relapse Prevention: Master Triggers and Cravings',
     description: 'Build a robust plan to anticipate high-risk situations, manage cravings, and recover quickly from slips. Learn evidence-based skills like urge surfing, HALT checks, and coping menus.'
+  },
+  {
+    id: 8,
+    module_number: 8,
+    title: 'Sustaining Recovery: Purpose, Service, and Growth',
+    description: 'Consolidate your gains by cultivating purpose, contributing to others, and designing long-term growth systems that keep recovery enjoyable and meaningful.'
   }
 ]
 
