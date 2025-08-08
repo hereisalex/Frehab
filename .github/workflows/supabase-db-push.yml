@@ -36,7 +36,7 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           # Construct a direct Postgres connection string to avoid interactive prompts
-          DB_URL="postgres://postgres:${SUPABASE_DB_PASSWORD}@db.avlfffrocdabopmssohw.supabase.co:5432/postgres"
+          DB_URL="postgres://postgres:${SUPABASE_DB_PASSWORD}@db.avlfffrocdabopmssohw.supabase.co:5432/postgres?sslmode=require"
           # Push migrations using the explicit DB URL
           supabase db push --db-url "$DB_URL" --debug
 
