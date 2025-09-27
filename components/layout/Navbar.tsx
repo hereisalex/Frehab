@@ -10,10 +10,9 @@ export default function Navbar() {
   const { user, signOut } = useAuth()
 
   const navigationLinks = [
-    { name: 'The Vision', href: '/vision' },
-    { name: 'The Platform', href: '/platform' },
-    { name: 'Roadmap', href: '/roadmap' },
-    { name: 'Principles', href: '/principles' },
+    { name: 'Recovery Program', href: '/program' },
+    { name: 'Recovery Tools', href: '/tools' },
+    { name: 'About', href: '/vision' },
   ]
 
   const handleSignOut = async () => {
@@ -25,10 +24,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center gap-2">
             <Link href="/" className="text-2xl font-bold text-primary-600">
               Frehab
             </Link>
+            <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
+              Alpha
+            </span>
           </div>
 
           {/* Desktop Navigation */}
@@ -43,6 +45,12 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              <a
+                href="tel:988"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Crisis Support: 988
+              </a>
             </div>
           </div>
 
@@ -122,6 +130,13 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            <a
+              href="tel:988"
+              className="bg-red-600 hover:bg-red-700 text-white block px-3 py-3 rounded-md text-base font-medium text-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              🚨 Crisis Support: Call 988
+            </a>
             <div className="pt-4 pb-3 border-t border-neutral-200">
               <div className="flex flex-col space-y-2">
                 {user ? (

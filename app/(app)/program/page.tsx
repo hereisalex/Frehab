@@ -1,15 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
+import ClinicalDisclaimer from '@/components/ClinicalDisclaimer'
+import DonationSupport from '@/components/DonationSupport'
 
 interface Module {
-  id: number
+  id: number | string
   module_number: number
   title: string
   description: string
+  track_info?: {
+    track_id: string
+    track_name: string
+    track_category: string
+    track_icon: string
+    primary_color: string
+    secondary_color: string
+  }
 }
 
 // Mock data for development when Supabase is not configured
@@ -66,15 +77,36 @@ const mockModules: Module[] = [
   }
 ]
 
-export default function ProgramPage() {
+function ProgramPageContent() {
   const [modules, setModules] = useState<Module[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
   const [usingMockData, setUsingMockData] = useState(false)
+  const searchParams = useSearchParams()
+  const selectedTrack = searchParams.get('track')
 
   useEffect(() => {
     const fetchModules = async () => {
       try {
+        if (selectedTrack) {
+          // Fetch track-specific modules from new API
+          try {
+            const response = await fetch(`/api/tracks/${selectedTrack}/modules`)
+            if (response.ok) {
+              const result = await response.json()
+              if (result.success) {
+                setModules(result.modules || [])
+                setUsingMockData(false)
+                setLoading(false)
+                return
+              }
+            }
+          } catch (trackError) {
+            console.error('Error fetching track modules, falling back to general:', trackError)
+          }
+        }
+
+        // Fetch generic modules (fallback or no track selected)
         const { data, error } = await supabase
           .from('modules')
           .select('*')
@@ -104,7 +136,7 @@ export default function ProgramPage() {
     }
 
     fetchModules()
-  }, [])
+  }, [selectedTrack])
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,34 +174,77 @@ export default function ProgramPage() {
           </div>
         )}
 
-        {/* Program Overview */}
+        {/* Clinical Disclaimer */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6 border border-primary-200">
-            <h2 className="text-xl font-semibold text-text mb-3">
-              Your Recovery Journey
-            </h2>
-            <p className="text-neutral-600 mb-4">
-              The Core Program is designed to guide you through a comprehensive recovery process. 
-              Each module builds upon the previous one, creating a strong foundation for lasting change. 
-              Take your time with each module and practice the skills you learn.
-            </p>
-            <div className="flex flex-wrap gap-4 text-sm text-neutral-600">
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mr-2"></div>
-                Evidence-based methods
+                <ClinicalDisclaimer id="program-main" />
+        </div>
+
+                {/* Track Selection Display */}
+                {selectedTrack && (
+                  <div className="mb-6">
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl p-6">
+                      <h2 className="text-xl font-semibold mb-2">
+                        {selectedTrack.charAt(0).toUpperCase() + selectedTrack.slice(1).replace('-', ' ')} Recovery Track
+                      </h2>
+                      <p className="opacity-90">
+                        You&apos;ve selected the {selectedTrack.replace('-', ' ')} recovery track. 
+                        This program is tailored with specific strategies and insights for your situation.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Welcome Message for New Users */}
+                <div className="mb-8">
+                  <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-200">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                      Welcome to Your Recovery Program 🎯
+                    </h2>
+                    <p className="text-gray-700 mb-4">
+                      You&apos;ve taken the first step! This structured 8-module program will guide you through 
+                      evidence-based recovery techniques. Each module takes about 15-30 minutes and builds on the previous one.
+                      {selectedTrack && ` The content is specifically adapted for ${selectedTrack.replace('-', ' ')} recovery.`}
+                    </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="font-medium text-gray-900">Start Immediately</span>
+                </div>
+                <p className="text-sm text-gray-600">No signup required - dive right in</p>
               </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mr-2"></div>
-                Self-paced learning
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="font-medium text-gray-900">Your Own Pace</span>
+                </div>
+                <p className="text-sm text-gray-600">Take breaks, revisit modules anytime</p>
               </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mr-2"></div>
-                Practical tools & exercises
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="font-medium text-gray-900">Evidence-Based</span>
+                </div>
+                <p className="text-sm text-gray-600">Proven CBT and recovery methods</p>
               </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mr-2"></div>
-                Community support integration
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="font-medium text-gray-900">Completely Private</span>
+                </div>
+                <p className="text-sm text-gray-600">Anonymous access, no personal data</p>
               </div>
+            </div>
+
+            <div className="bg-blue-100 rounded-lg p-4">
+              <p className="text-blue-800 text-sm">
+                <strong>💡 Tip:</strong> Create an account later to save your progress across devices, 
+                or continue anonymously - both options work great!
+              </p>
             </div>
           </div>
         </div>
@@ -240,7 +315,7 @@ export default function ProgramPage() {
                       <span>Self-paced</span>
                     </div>
                     
-                    <Link href={`/program/${module.module_number}`}>
+                    <Link href={`/program/${module.module_number}${selectedTrack ? `?track=${selectedTrack}` : ''}`}>
                       <Button variant="primary" size="sm">
                         Start Module
                       </Button>
@@ -252,26 +327,39 @@ export default function ProgramPage() {
           )}
         </div>
 
-        {/* Coming Soon */}
-        <div className="mt-12">
-          <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
-            <h3 className="text-lg font-semibold text-text mb-2">
-              More Modules Coming Soon
-            </h3>
-            <p className="text-neutral-600 mb-4">
-               We&apos;re working on additional modules to support your recovery journey. 
-              Future modules will cover topics like coping strategies, relapse prevention, 
-              and building a fulfilling life in recovery.
-            </p>
-            <div className="flex items-center text-sm text-neutral-500">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Stay tuned for updates</span>
-            </div>
-          </div>
-        </div>
+                {/* Support Frehab */}
+                <div className="mt-12">
+                  <DonationSupport variant="inline" className="mb-6" />
+                </div>
+
+                {/* Coming Soon */}
+                <div className="mt-6">
+                  <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
+                    <h3 className="text-lg font-semibold text-text mb-2">
+                      More Modules Coming Soon
+                    </h3>
+                    <p className="text-neutral-600 mb-4">
+                       We&apos;re working on additional modules to support your recovery journey. 
+                      Future modules will cover topics like coping strategies, relapse prevention, 
+                      and building a fulfilling life in recovery.
+                    </p>
+                    <div className="flex items-center text-sm text-neutral-500">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Stay tuned for updates</span>
+                    </div>
+                  </div>
+                </div>
       </div>
     </div>
+  )
+}
+
+export default function ProgramPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ProgramPageContent />
+    </Suspense>
   )
 } 

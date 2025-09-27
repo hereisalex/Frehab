@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
@@ -17,7 +17,7 @@ import SupportNetwork3D from '@/components/games/SupportNetwork3D'
 import RoutineArchitect3D from '@/components/games/RoutineArchitect3D'
 
 interface Module {
-  id: number
+  id: number | string
   module_number: number
   title: string
   description: string
@@ -45,10 +45,12 @@ interface Module {
 
 
 
-export default function ModulePage() {
+function ModulePageContent() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const moduleId = params.moduleId as string
+  const trackId = searchParams.get('track')
   
   const [module, setModule] = useState<Module | null>(null)
   const [loading, setLoading] = useState(true)
@@ -84,21 +86,47 @@ export default function ModulePage() {
     } catch {}
   }
 
-  const handleLessonClick = (lessonId: string, url: string) => {
+  const handleLessonClick = async (lessonId: string, url: string) => {
     if (!lessonsCompleted.includes(lessonId)) {
       const next = [...lessonsCompleted, lessonId]
       setLessonsCompleted(next)
       saveProgressToStorage({ lessonsCompleted: next })
     }
+    try {
+      const isLocal = url.startsWith('/')
+      if (isLocal) {
+        const head = await fetch(url, { method: 'HEAD' })
+        if (!head.ok) {
+          alert('Resource not available yet. Redirecting to tools page as a fallback.')
+          router.push('/tools')
+          return
+        }
+      }
+    } catch {}
     window.open(url, '_blank')
   }
 
-  const handleToolClick = (toolId: string, url: string) => {
+  const handleToolClick = async (toolId: string, url: string) => {
     if (!toolsUsed.includes(toolId)) {
       const next = [...toolsUsed, toolId]
       setToolsUsed(next)
       saveProgressToStorage({ toolsUsed: next })
     }
+    try {
+      const isLocal = url.startsWith('/')
+      if (isLocal) {
+        const head = await fetch(url, { method: 'HEAD' })
+        if (!head.ok) {
+          alert('Resource not available yet. Opening a helpful fallback page.')
+          if (url.endsWith('.pdf')) {
+            router.push('/tools')
+          } else {
+            router.push('/wiki/paws')
+          }
+          return
+        }
+      }
+    } catch {}
     window.open(url, '_blank')
   }
 
@@ -112,6 +140,31 @@ export default function ModulePage() {
   useEffect(() => {
     const fetchModule = async () => {
       try {
+        // If a track is selected, try track-specific API first
+        if (trackId) {
+          try {
+            const res = await fetch(`/api/tracks/${trackId}/modules?moduleNumber=${moduleId}`)
+            if (res.ok) {
+              const json = await res.json()
+              const trackModules = Array.isArray(json?.modules) ? json.modules : []
+              if (json.success && trackModules.length > 0) {
+                const tm = trackModules[0]
+                setModule({
+                  id: tm.id,
+                  module_number: tm.module_number,
+                  title: tm.title,
+                  description: tm.description,
+                  content: tm.content
+                })
+                return
+              }
+            }
+          } catch (e) {
+            console.error('Track module fetch failed, falling back to generic', e)
+          }
+        }
+
+        // Fallback to generic modules table
         const { data, error } = await supabase
           .from('modules')
           .select('*')
@@ -120,49 +173,26 @@ export default function ModulePage() {
 
         if (error) {
           console.error('Error fetching module:', error)
-          
-          // Check if it's a configuration error
+
           if (error.message?.includes('Supabase not configured')) {
-            // Provide mock data for Module 1
+            // Provide minimal mock for module 1-3 as before
             if (parseInt(moduleId) === 1) {
               setModule({
                 id: 1,
                 module_number: 1,
                 title: 'Foundation: Understanding Recovery',
-                description: 'Begin your recovery journey by building a solid foundation. This module introduces key concepts, helps you understand your relationship with substances, and establishes the mindset needed for lasting change. You\'ll learn about the science of addiction, develop self-awareness, and create your personal recovery vision.',
+                description: 'Begin your recovery journey by building a solid foundation. This module introduces key concepts and establishes the mindset needed for lasting change.',
                 content: {
                   lessons: [
                     {
                       type: 'reading',
                       title: 'The Stages of Change',
-                      summary: 'Understanding the psychological stages people go through when making behavioral changes, from precontemplation to maintenance.',
+                      summary: 'Understanding stages from precontemplation to maintenance.',
                       external_url: 'https://www.verywellmind.com/stages-of-change-2795713',
                       button_text: 'Read Article'
-                    },
-                    {
-                      type: 'video',
-                      title: 'Cost-Benefit Analysis',
-                      summary: 'Learn how to systematically evaluate the pros and cons of your current behaviors and potential changes.',
-                      video_id: 'dQw4w9WgXcQ',
-                      button_text: 'Watch Video'
-                    },
-                    {
-                      type: 'tool',
-                      title: 'Download Your Worksheet',
-                      summary: 'Get your personal worksheet to complete the exercises in this module.',
-                      pdf_url: '/worksheets/module1-worksheet.pdf',
-                      button_text: 'Download PDF'
                     }
                   ],
-                  tools: [
-                    {
-                      type: 'wiki',
-                      title: 'The Psychology of Motivation',
-                      summary: 'Deep dive into the psychological principles that drive behavior change and sustained motivation.',
-                      wiki_url: '/wiki/psychology-of-motivation',
-                      button_text: 'Read Article'
-                    }
-                  ]
+                  tools: []
                 }
               })
             } else if (parseInt(moduleId) === 2) {
@@ -170,88 +200,21 @@ export default function ModulePage() {
                 id: 2,
                 module_number: 2,
                 title: 'Building Your Support System',
-                description: 'Recovery doesn\'t happen in isolation. This module focuses on building and strengthening your support network. Learn how to identify healthy relationships, communicate your needs effectively, and develop the skills to maintain boundaries. You\'ll also explore how to find and connect with recovery communities that align with your values.',
-                content: {
-                  lessons: [
-                    {
-                      type: 'video',
-                      title: 'The Science of Addiction',
-                      summary: 'Understanding the neurobiology of addiction, including dopamine pathways and neuroplasticity. Learn how substances affect the brain and why recovery is possible.',
-                      video_id: 'V1bFr2SWP1I',
-                      button_text: 'Watch Video'
-                    },
-                    {
-                      type: 'reading',
-                      title: 'Understanding Triggers',
-                      summary: 'Learn to identify and understand your personal triggers for substance use. This evidence-based guide helps you recognize patterns and develop coping strategies.',
-                      external_url: 'https://nida.nih.gov/publications/drugs-brains-behavior-science-addiction/treatment-recovery',
-                      button_text: 'Read Article'
-                    },
-                    {
-                      type: 'audio',
-                      title: 'Mindful Observation',
-                      summary: 'A 5-minute guided mindfulness exercise to help you develop awareness of your thoughts, feelings, and urges without judgment.',
-                      audio_url: '/audio/mindful-observation.mp3',
-                      duration: '5:00',
-                      button_text: 'Listen Now'
-                    }
-                  ],
-                  tools: [
-                    {
-                      type: 'wiki',
-                      title: 'Post-Acute Withdrawal Syndrome (PAWS)',
-                      summary: 'Understanding the long-term effects of substance withdrawal and how to manage symptoms that may persist for weeks or months after stopping use.',
-                      wiki_url: '/wiki/paws',
-                      button_text: 'Read Article'
-                    }
-                  ]
-                }
+                description: 'Strengthen your support network and boundaries.',
+                content: { lessons: [], tools: [] }
               })
             } else if (parseInt(moduleId) === 3) {
               setModule({
                 id: 3,
                 module_number: 3,
-                title: 'From Values to Habits: Build Your Recovery System',
-                description: 'Translate your core values into small, repeatable habits. Design systems that make the right choice the easy choice, aligning daily actions with the life you want.',
-                content: {
-                  lessons: [
-                    {
-                      type: 'reading',
-                      title: 'Atomic Habits: Systems Over Goals',
-                      summary: 'Why focusing on systems and identity-based habits leads to durable behavior change.',
-                      external_url: 'https://jamesclear.com/atomic-habits',
-                      button_text: 'Read Article'
-                    },
-                    {
-                      type: 'video',
-                      title: 'Tiny Habits That Stick',
-                      summary: 'A short overview of designing habits so small they are impossible to skip.',
-                      video_id: 'AdKUJxjn-R8',
-                      button_text: 'Watch Video'
-                    },
-                    {
-                      type: 'reading',
-                      title: 'Implementation Intentions',
-                      summary: 'Use if-then plans to make actions automatic in the moments that matter.',
-                      external_url: 'https://en.wikipedia.org/wiki/Implementation_intention',
-                      button_text: 'Read Overview'
-                    }
-                  ],
-                  tools: [
-                    {
-                      type: 'wiki',
-                      title: 'Habit Stacking',
-                      summary: 'Attach new behaviors to existing routines to reduce friction.',
-                      wiki_url: '/wiki/habit-stacking',
-                      button_text: 'Open Guide'
-                    }
-                  ]
-                }
+                title: 'From Values to Habits',
+                description: 'Translate your core values into small, repeatable habits.',
+                content: { lessons: [], tools: [] }
               })
             } else {
               setError('Module not found')
             }
-          } else if ('code' in error && error.code === 'PGRST116') { // No rows returned
+          } else if ('code' in error && (error as any).code === 'PGRST116') {
             setError('Module not found')
           } else {
             setError('Failed to load module. Please try again.')
@@ -271,7 +234,7 @@ export default function ModulePage() {
       fetchModule()
       loadProgressFromStorage()
     }
-  }, [moduleId])
+  }, [moduleId, trackId])
 
   if (loading) {
     return (
@@ -346,7 +309,7 @@ export default function ModulePage() {
       <div className="bg-white border-b border-neutral-200 px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center space-x-4 mb-4">
-            <Link href="/program">
+            <Link href={`/program${trackId ? `?track=${trackId}` : ''}`}>
               <Button variant="ghost" size="sm">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -832,13 +795,13 @@ export default function ModulePage() {
                   </Button>
                 </Link>
                 {module.module_number > 1 && (
-                  <Link href={`/program/${module.module_number - 1}`}>
+                  <Link href={`/program/${module.module_number - 1}${trackId ? `?track=${trackId}` : ''}`}>
                     <Button variant="ghost" size="sm" className="w-full justify-start">
                       ← Previous Module
                     </Button>
                   </Link>
                 )}
-                <Link href={`/program/${module.module_number + 1}`}>
+                <Link href={`/program/${module.module_number + 1}${trackId ? `?track=${trackId}` : ''}`}>
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     Next Module →
                   </Button>
@@ -862,5 +825,33 @@ export default function ModulePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ModulePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-neutral-200 rounded mb-4"></div>
+            <div className="h-4 bg-neutral-200 rounded mb-8"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-64 bg-neutral-200 rounded"></div>
+                <div className="h-64 bg-neutral-200 rounded"></div>
+                <div className="h-64 bg-neutral-200 rounded"></div>
+              </div>
+              <div className="space-y-6">
+                <div className="h-48 bg-neutral-200 rounded"></div>
+                <div className="h-48 bg-neutral-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ModulePageContent />
+    </Suspense>
   )
 } 

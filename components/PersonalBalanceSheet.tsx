@@ -60,7 +60,7 @@ export default function PersonalBalanceSheet({ onSave }: PersonalBalanceSheetPro
         console.error('Error saving journal entry:', result.error)
         if (result.error.message?.includes('Supabase not configured')) {
           // In development mode, just show success
-          console.log('Mock save successful')
+          // Save successful in mock mode
         } else {
           throw result.error
         }

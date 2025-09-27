@@ -20,18 +20,18 @@ if (typeof window !== 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
 
 // Create a mock client if environment variables are missing (for development)
 const createMockClient = () => {
-  console.log('Using mock Supabase client - environment variables not found')
+  // Using mock Supabase client - environment variables not found
+  const mockQuery = {
+    single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    order: () => mockQuery,
+    eq: () => mockQuery,
+    gte: () => mockQuery,
+    then: (resolve: any) => resolve({ data: [], error: { message: 'Supabase not configured' } })
+  }
+
   return {
     from: () => ({
-      select: () => ({
-        eq: () => ({
-          single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
-        }),
-        gte: () => ({
-          order: () => Promise.resolve({ data: [], error: { message: 'Supabase not configured' } })
-        }),
-        order: () => Promise.resolve({ data: [], error: { message: 'Supabase not configured' } })
-      }),
+      select: () => mockQuery,
       insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
       upsert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
     }),

@@ -162,6 +162,8 @@ export default function SupportNetwork3D({ onComplete }: Props) {
   const entitiesRef = useRef<Entity[]>([])
   const speedRef = useRef(1.1)
   const elapsedMsRef = useRef(0)
+  const runningRef = useRef<boolean>(running)
+  useEffect(() => { runningRef.current = running }, [running])
 
   // controls
   const onLeft = useCallback(() => {
@@ -266,7 +268,7 @@ export default function SupportNetwork3D({ onComplete }: Props) {
           <fog attach="fog" args={["#e0f2fe", 8, 40]} />
           <Ground />
           <NetworkLoop
-            runningRef={useRef(running)}
+            runningRef={runningRef}
             entitiesRef={entitiesRef}
             playerLaneRef={playerLaneRef}
             speedRef={speedRef}

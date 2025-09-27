@@ -96,7 +96,7 @@ export default function ValuesToHabitsPlanner({ onSave }: { onSave?: () => void 
       if (error) {
         if (error.message?.includes('Supabase not configured')) {
           // Dev mode fallback
-          console.log('[Dev] Saved locally:', payload)
+          // Data saved locally in development mode
         } else {
           throw error
         }

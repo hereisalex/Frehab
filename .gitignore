@@ -40,4 +40,4 @@ secrets.txt
 OAUTH_CREDENTIALS.md
 .env
 .env.local
-.env.production
+.env.production.env.local
