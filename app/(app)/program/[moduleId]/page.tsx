@@ -15,6 +15,7 @@ import CommunityBuilder from '@/components/games/CommunityBuilder'
 import FutureBuilder from '@/components/games/FutureBuilder'
 import SupportNetwork3D from '@/components/games/SupportNetwork3D'
 import RoutineArchitect3D from '@/components/games/RoutineArchitect3D'
+import VideoModal from '@/components/VideoModal'
 
 interface Module {
   id: number | string
@@ -58,6 +59,11 @@ function ModulePageContent() {
   const [lessonsCompleted, setLessonsCompleted] = useState<string[]>([])
   const [toolsUsed, setToolsUsed] = useState<string[]>([])
   const [projectCompleted, setProjectCompleted] = useState<boolean>(false)
+  const [videoModal, setVideoModal] = useState<{ isOpen: boolean; title: string; url: string }>({
+    isOpen: false,
+    title: '',
+    url: ''
+  })
 
   const storageKey = `module_progress_${moduleId}`
 
@@ -86,7 +92,7 @@ function ModulePageContent() {
     } catch {}
   }
 
-  const handleLessonClick = async (lessonId: string, url: string) => {
+  const handleLessonClick = async (lessonId: string, url: string, title: string) => {
     if (!lessonsCompleted.includes(lessonId)) {
       const next = [...lessonsCompleted, lessonId]
       setLessonsCompleted(next)
@@ -103,7 +109,13 @@ function ModulePageContent() {
         }
       }
     } catch {}
-    window.open(url, '_blank')
+    
+    // Open video in modal for external URLs, new tab for YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      window.open(url, '_blank')
+    } else {
+      setVideoModal({ isOpen: true, title, url })
+    }
   }
 
   const handleToolClick = async (toolId: string, url: string) => {
@@ -452,17 +464,17 @@ function ModulePageContent() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-blue-600 hover:text-blue-700"
-                                onClick={() => handleLessonClick(lessonId, lesson.external_url!)}
+                                onClick={() => handleLessonClick(lessonId, lesson.external_url!, lesson.title)}
                               >
                                 {lesson.button_text} →
                               </Button>
                             )}
-                            {lesson.type === 'video' && lesson.video_id && (
+                            {lesson.type === 'video' && (lesson.video_id || lesson.external_url) && (
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-red-600 hover:text-red-700"
-                                onClick={() => handleLessonClick(lessonId, `https://www.youtube.com/watch?v=${lesson.video_id}`)}
+                                onClick={() => handleLessonClick(lessonId, lesson.video_id ? `https://www.youtube.com/watch?v=${lesson.video_id}` : lesson.external_url!, lesson.title)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -472,7 +484,7 @@ function ModulePageContent() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-purple-600 hover:text-purple-700"
-                                onClick={() => handleLessonClick(lessonId, lesson.audio_url!)}
+                                onClick={() => handleLessonClick(lessonId, lesson.audio_url!, lesson.title)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -482,7 +494,7 @@ function ModulePageContent() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-green-600 hover:text-green-700"
-                                onClick={() => handleLessonClick(lessonId, lesson.pdf_url!)}
+                                onClick={() => handleLessonClick(lessonId, lesson.pdf_url!, lesson.title)}
                               >
                                 {lesson.button_text} →
                               </Button>
@@ -824,6 +836,14 @@ function ModulePageContent() {
           </div>
         </div>
       </div>
+      
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ isOpen: false, title: '', url: '' })}
+        title={videoModal.title}
+        url={videoModal.url}
+      />
     </div>
   )
 }

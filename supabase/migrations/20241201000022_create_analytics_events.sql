@@ -51,8 +51,7 @@ CREATE OR REPLACE VIEW analytics_page_summary AS
 SELECT 
     COALESCE(page, 'Unknown') as page,
     COUNT(*) as total_events,
-    COUNT(DISTINCT session_id) as unique_sessions,
-    AVG(EXTRACT(EPOCH FROM (LAG(timestamp) OVER (PARTITION BY session_id ORDER BY timestamp) - timestamp))) as avg_time_on_page
+    COUNT(DISTINCT session_id) as unique_sessions
 FROM analytics_events
 WHERE event_name = 'page_view'
     AND timestamp >= NOW() - INTERVAL '30 days'

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabaseClient'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 // GET /api/tracks/[trackId]/modules - Get modules for a specific track
 export async function GET(
@@ -19,9 +21,14 @@ export async function GET(
       )
     }
 
-    // Use the database function to get track modules with fallback
+    // Get the current user for LGBT+ content preferences
+    const supabaseAuth = createRouteHandlerClient({ cookies })
+    const { data: { user } } = await supabaseAuth.auth.getUser()
+    const userId = user?.id || null
+
+    // Use the database function to get track modules with fallback and user preferences
     const { data, error } = await supabase
-      .rpc('get_track_modules', { p_track_id: trackId })
+      .rpc('get_track_modules', { p_track_id: trackId, p_user_id: userId })
 
     if (error) {
       console.error('Database error:', error)

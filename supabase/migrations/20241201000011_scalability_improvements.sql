@@ -281,59 +281,53 @@ DO $$ BEGIN
 END $$;
 
 -- 7) Override award_achievements_for_checkin to use cached streaks
-DO $$ BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc WHERE proname = 'award_achievements_for_checkin'
+CREATE OR REPLACE FUNCTION award_achievements_for_checkin(p_user UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  _streak INTEGER;
+  _ach_id UUID;
+BEGIN
+  -- first_checkin
+  _ach_id := get_achievement_id('first_checkin');
+  IF _ach_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM user_achievements WHERE user_id = p_user AND achievement_id = _ach_id
   ) THEN
-    CREATE OR REPLACE FUNCTION award_achievements_for_checkin(p_user UUID)
-    RETURNS VOID
-    LANGUAGE plpgsql
-    SECURITY DEFINER
-    SET search_path = public
-    AS $$
-    DECLARE
-      _streak INTEGER;
-      _ach_id UUID;
-    BEGIN
-      -- first_checkin
-      _ach_id := get_achievement_id('first_checkin');
-      IF _ach_id IS NOT NULL AND NOT EXISTS (
-        SELECT 1 FROM user_achievements WHERE user_id = p_user AND achievement_id = _ach_id
-      ) THEN
-        IF EXISTS (SELECT 1 FROM daily_checkins WHERE user_id = p_user) THEN
-          INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
-          ON CONFLICT DO NOTHING;
-        END IF;
-      END IF;
-
-      -- streak thresholds using cached value
-      SELECT get_current_streak_fast(p_user) INTO _streak;
-      IF _streak IS NULL THEN _streak := 0; END IF;
-
-      IF _streak >= 3 THEN
-        _ach_id := get_achievement_id('streak_3');
-        IF _ach_id IS NOT NULL THEN
-          INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
-          ON CONFLICT DO NOTHING;
-        END IF;
-      END IF;
-
-      IF _streak >= 7 THEN
-        _ach_id := get_achievement_id('streak_7');
-        IF _ach_id IS NOT NULL THEN
-          INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
-          ON CONFLICT DO NOTHING;
-        END IF;
-      END IF;
-
-      IF _streak >= 30 THEN
-        _ach_id := get_achievement_id('streak_30');
-        IF _ach_id IS NOT NULL THEN
-          INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
-          ON CONFLICT DO NOTHING;
-        END IF;
-      END IF;
-    END;
-    $$;
+    IF EXISTS (SELECT 1 FROM daily_checkins WHERE user_id = p_user) THEN
+      INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
+      ON CONFLICT DO NOTHING;
+    END IF;
   END IF;
-END $$;
+
+  -- streak thresholds using cached value
+  SELECT get_current_streak_fast(p_user) INTO _streak;
+  IF _streak IS NULL THEN _streak := 0; END IF;
+
+  IF _streak >= 3 THEN
+    _ach_id := get_achievement_id('streak_3');
+    IF _ach_id IS NOT NULL THEN
+      INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
+      ON CONFLICT DO NOTHING;
+    END IF;
+  END IF;
+
+  IF _streak >= 7 THEN
+    _ach_id := get_achievement_id('streak_7');
+    IF _ach_id IS NOT NULL THEN
+      INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
+      ON CONFLICT DO NOTHING;
+    END IF;
+  END IF;
+
+  IF _streak >= 30 THEN
+    _ach_id := get_achievement_id('streak_30');
+    IF _ach_id IS NOT NULL THEN
+      INSERT INTO user_achievements(user_id, achievement_id) VALUES (p_user, _ach_id)
+      ON CONFLICT DO NOTHING;
+    END IF;
+  END IF;
+END;
+$$;
