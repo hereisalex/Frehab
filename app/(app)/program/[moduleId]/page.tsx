@@ -15,6 +15,8 @@ import CommunityBuilder from '@/components/games/CommunityBuilder'
 import FutureBuilder from '@/components/games/FutureBuilder'
 import SupportNetwork3D from '@/components/games/SupportNetwork3D'
 import RoutineArchitect3D from '@/components/games/RoutineArchitect3D'
+import FeelingsIdentification from '@/components/tools/FeelingsIdentification'
+import PersonalizedAlternatives from '@/components/tools/PersonalizedAlternatives'
 import VideoModal from '@/components/VideoModal'
 
 interface Module {
@@ -314,6 +316,8 @@ function ModulePageContent() {
   const isModule6 = module.module_number === 6
   const isModule7 = module.module_number === 7
   const isModule8 = module.module_number === 8
+  const isModule9 = module.module_number === 9
+  const isTrackModule9 = trackId && module.module_number === 9
 
   return (
     <div className="min-h-screen bg-background">
@@ -621,6 +625,62 @@ function ModulePageContent() {
                   <RoutineArchitect3D onComplete={() => saveProgressToStorage({ projectCompleted: true })} />
                 </div>
               </div>
+            ) : isModule9 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Feelings Identification Tool</h2>
+                  </div>
+                  <p className="text-neutral-600">Identify what feelings you were trying to achieve through substance use and discover natural alternatives that can provide the same emotional benefits.</p>
+                </div>
+                <FeelingsIdentification />
+                
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Personalized Natural Alternatives</h2>
+                  </div>
+                  <p className="text-neutral-600">Build your personal toolkit of healthy activities that help you achieve the feelings you want without substances.</p>
+                </div>
+                <PersonalizedAlternatives />
+              </div>
+            ) : isTrackModule9 ? (
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Feelings Identification Tool</h2>
+                  </div>
+                  <p className="text-neutral-600">Identify what feelings you were trying to achieve through {trackId} use and discover natural alternatives that can provide the same emotional benefits.</p>
+                </div>
+                <FeelingsIdentification />
+                
+                <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-semibold text-text">Personalized Natural Alternatives</h2>
+                  </div>
+                  <p className="text-neutral-600">Build your personal toolkit of healthy activities that help you achieve the feelings you want without {trackId}.</p>
+                </div>
+                <PersonalizedAlternatives />
+              </div>
             ) : (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="flex items-center space-x-3 mb-6">
@@ -679,7 +739,7 @@ function ModulePageContent() {
             )}
 
             {/* Placeholder for other modules */}
-            {!isModule1 && !isModule3 && !isModule4 && !isModule5 && !isModule6 && !isModule7 && !isModule8 && (
+            {!isModule1 && !isModule3 && !isModule4 && !isModule5 && !isModule6 && !isModule7 && !isModule8 && !isModule9 && !isTrackModule9 && (
               <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-neutral-200 rounded-full mx-auto mb-4 flex items-center justify-center">

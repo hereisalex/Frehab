@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabaseClient'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic'
 
 // GET /api/tracks/[trackId]/modules - Get modules for a specific track
 export async function GET(
@@ -22,7 +25,29 @@ export async function GET(
     }
 
     // Get the current user for LGBT+ content preferences
-    const supabaseAuth = createRouteHandlerClient({ cookies })
+    const cookieStore = cookies()
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    )
     const { data: { user } } = await supabaseAuth.auth.getUser()
     const userId = user?.id || null
 

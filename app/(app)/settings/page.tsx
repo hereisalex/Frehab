@@ -109,60 +109,18 @@ export default function SettingsPage() {
         )}
 
         <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
-          <h2 className="text-xl font-semibold text-slate-700 mb-6">Content Preferences</h2>
+          <h2 className="text-xl font-semibold text-slate-700 mb-6">Account Settings</h2>
           
-          {/* LGBT+ Insights Toggle */}
-          <div className="border border-neutral-200 rounded-lg p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-medium text-slate-700">
-                    LGBT+ Community Insights
-                  </h3>
-                  <div className="relative group">
-                    <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                      <div className="max-w-xs">
-                        <p className="font-medium mb-1">Why LGBT+ insights matter:</p>
-                        <p>LGBT+ individuals face 2-3x higher rates of substance use disorders due to minority stress, discrimination, and social factors. Community-specific insights help make treatment more effective by addressing unique triggers and challenges.</p>
-                      </div>
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-slate-600 mb-4">
-                  Enable additional content and insights specifically relevant to LGBT+ individuals in recovery. 
-                  This includes community-specific challenges, triggers, and recovery strategies for methamphetamine, 
-                  alcohol, and opioid addiction.
-                </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 text-sm">
-                    <strong>What you'll get:</strong> Additional lessons, tools, and resources that address 
-                    LGBT+ specific experiences with addiction, including social pressures, healthcare discrimination, 
-                    and community-specific recovery challenges.
-                  </p>
-                </div>
-              </div>
-              <div className="ml-6">
-                <button
-                  onClick={() => handlePreferenceChange('lgbt_insights_enabled', !preferences.lgbt_insights_enabled)}
-                  disabled={saving}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-                    preferences.lgbt_insights_enabled ? 'bg-primary-600' : 'bg-neutral-200'
-                  } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      preferences.lgbt_insights_enabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
+          <div className="text-center py-8">
+            <p className="text-slate-600 mb-4">
+              LGBT+ Community Insights can be enabled when you select a recovery track.
+            </p>
+            <a 
+              href="/program" 
+              className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+            >
+              Choose Recovery Track
+            </a>
           </div>
         </div>
 

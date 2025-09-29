@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/lib/authContext'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import ClinicalDisclaimer from '@/components/ClinicalDisclaimer'
@@ -82,12 +83,31 @@ function ProgramPageContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
   const [usingMockData, setUsingMockData] = useState(false)
+  const { user } = useAuth()
   const searchParams = useSearchParams()
   const selectedTrack = searchParams.get('track')
+  const lgbtEnabled = searchParams.get('lgbt') === 'true'
 
   useEffect(() => {
     const fetchModules = async () => {
       try {
+        // Save LGBT+ preference if user is authenticated and lgbt parameter is present
+        if (user && lgbtEnabled) {
+          try {
+            await fetch('/api/user/preferences', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                lgbt_insights_enabled: true
+              })
+            })
+          } catch (error) {
+            console.error('Failed to save LGBT+ preference:', error)
+          }
+        }
+
         if (selectedTrack) {
           // Fetch track-specific modules from new API
           try {
@@ -136,7 +156,7 @@ function ProgramPageContent() {
     }
 
     fetchModules()
-  }, [selectedTrack])
+  }, [selectedTrack, user, lgbtEnabled])
 
   return (
     <div className="min-h-screen bg-background">

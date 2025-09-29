@@ -52,9 +52,9 @@ BEGIN
     END IF;
     
     -- Get LGBT+ insights for this module
-    SELECT lgbt_insights INTO lgbt_insights
+    SELECT track_modules.lgbt_insights INTO lgbt_insights
     FROM track_modules
-    WHERE track_id = p_track_id AND module_number = p_module_number;
+    WHERE track_modules.track_id = p_track_id AND track_modules.module_number = p_module_number;
     
     -- If no LGBT+ insights, return base content
     IF lgbt_insights IS NULL THEN
