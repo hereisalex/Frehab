@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useUser } from '@/hooks/useUser'
+import { useAuth } from '@/lib/authContext'
 
 interface FeelingsEntry {
   id: string
@@ -29,7 +29,7 @@ interface NaturalAlternative {
 }
 
 export default function FeelingsIdentification() {
-  const { user } = useUser()
+  const { user } = useAuth()
   const [entries, setEntries] = useState<FeelingsEntry[]>([])
   const [showForm, setShowForm] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
@@ -99,7 +99,7 @@ export default function FeelingsIdentification() {
 
       if (error) throw error
 
-      const formattedEntries = data?.map(entry => ({
+      const formattedEntries = data?.map((entry: any) => ({
         id: entry.id.toString(),
         timestamp: new Date(entry.created_at),
         feelingName: entry.feeling_name,

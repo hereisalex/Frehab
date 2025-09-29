@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useUser } from '@/hooks/useUser'
+import { useAuth } from '@/lib/authContext'
 
 interface NaturalAlternative {
   id: number
@@ -28,7 +28,7 @@ interface PersonalizedAlternative {
 }
 
 export default function PersonalizedAlternatives() {
-  const { user } = useUser()
+  const { user } = useAuth()
   const [selectedFeeling, setSelectedFeeling] = useState('')
   const [naturalAlternatives, setNaturalAlternatives] = useState<NaturalAlternative[]>([])
   const [personalizedAlternatives, setPersonalizedAlternatives] = useState<PersonalizedAlternative[]>([])

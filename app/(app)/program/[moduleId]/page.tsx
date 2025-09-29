@@ -478,7 +478,13 @@ function ModulePageContent() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-red-600 hover:text-red-700"
-                                onClick={() => handleLessonClick(lessonId, lesson.video_id ? `https://www.youtube.com/watch?v=${lesson.video_id}` : lesson.external_url!, lesson.title)}
+                                onClick={() => {
+                                  const videoUrl = lesson.external_url || (lesson.video_id ? `https://www.youtube.com/watch?v=${lesson.video_id}` : '')
+                                  if (videoUrl) {
+                                    setVideoModal({ isOpen: true, title: lesson.title, url: videoUrl })
+                                    handleLessonClick(lessonId, videoUrl, lesson.title)
+                                  }
+                                }}
                               >
                                 {lesson.button_text} →
                               </Button>
